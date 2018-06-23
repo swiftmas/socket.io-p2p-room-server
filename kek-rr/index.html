@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jscripttest</title>
+  <meta name="description" content="jscripttest">
+  <meta name="author" content="SitePoint">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- link rel="stylesheet" type="text/css" href="cli.css" -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/kek-rr/main.js"></script>
+</head>
+<body>
+<a href="#" onclick="socket.emit('create-room', 'room1');">click</a>
+<a href="#" onclick="socket.emit('join-room', 'room1');">join Room</a>
+<br>
+<br>
+<div id="chatbox"></div>
+<div id="chatText"></div>    
+<a href="#" onclick="document.getElementById('chetText').innerHtml=data"> 
+        <input name="usrmsg" type="text" id="usermsg" size="63" />
+        <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
+</div>
+</body>
+</html>
