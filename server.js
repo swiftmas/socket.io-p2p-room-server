@@ -61,7 +61,9 @@ io.on("connection", function(socket){
     p2pserver(socket, null, {name: roomId});
   });
   socket.on("addtochat", function(newdat) {
-    io.in('room1').emit("data", data + newdat);
+    data =  data + newdat + "<br>"
+    io.in('room1').emit("data", data);
+    logger.info("newchatdata: ", newdat)
   });
   socket.on("join-room", function(roomId){
     logger.info("Attempting to join room", {userId: socket.id, roomId: roomId});

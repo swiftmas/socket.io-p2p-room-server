@@ -12,14 +12,13 @@
   <script src="/kek-rr/main.js"></script>
 </head>
 <body>
-<a href="#" onclick="socket.emit('create-room', 'room1');">click</a>
-<a href="#" onclick="socket.emit('join-room', 'room1');">join Room</a>
+1. <a href="#" onclick="socket.emit('create-room', 'room1');">Create Room1</a></br>
+2.<a href="#" onclick="socket.emit('join-room', 'room1');">join Room1</a>
 <br>
 <br>
 <div id="chatbox"></div>
-<div id="chatText"></div>    
-<a href="#" onclick="document.getElementById('chetText').innerHtml=data"> 
-        <input name="usrmsg" type="text" id="usermsg" size="63" />
+<div id="chatText"></div>
+        <input name="usrmsg" type="text" id="usrmsg" size="63" />
         <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
 </div>
 </body>
