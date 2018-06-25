@@ -49,28 +49,37 @@ function init() {
   bufferLoader.load();
 }
 
-function stop(oneOrTwo){
-  switch(oneOrTwo) {
+function stop(oneAndOrTwo){
+  switch(oneAndOrTwo) {
     case 1:
-        source1.stop()
-        break;
+      source1.stop()
+      break;
     case 2:
-        source2.stop()
-        break;
+      source2.stop()
+      break;
+    case 12:
+      source1.stop();
+      source2.stop();
+      break; 
     default:
-        console.error("FATAL ERROR: UR A SKRUB... ONE OR TWO MEANS ONE OR TWO")
+      break; 
+      console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
   }
 }
-function start(oneOrTwo){
-  switch(oneOrTwo) {
+function start(oneAndOrTwo){
+  switch(oneAndOrTwo) {
     case 1:
         source1.start(0)
         break;
     case 2:
         source2.start(0)
         break;
+    case 12:
+      source1.stop();
+      source2.stop();
+      break; 
     default:
-        console.error("FATAL ERROR: UR A SKRUB... ONE OR TWO MEANS ONE OR TWO")
+        console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
   }
 }
   
