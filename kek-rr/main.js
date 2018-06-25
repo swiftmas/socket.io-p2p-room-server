@@ -129,9 +129,19 @@ function draw() {
   canvasCtx.stroke();
 };
 
-
-
-
-
-
+function newTrack(file, trackNo){
+  console.log("\nNew Track INC. \nTrack" + trackNo + " - Path:" + file);
+  //TODO LOAD THIS INTO THE BUFFERZ and reset
+  //look at buffer loader and stuff
+  //wow
+  if(trackNo == 1){
+    source1.buffer = file;
+  }
+  else{
+    source2.buffer = file;
+  }
+  reset();
+  };
+  
+  // reader.readAsText(evt.target.files[0]);
 
