@@ -58,7 +58,6 @@ io.on("connection", function(socket){
   socket.on("create-room", function(roomId) {
     socket.join(roomId);
     logger.info("created Room", {roomId: roomId});
-    p2pserver(socket, null, {name: roomId});
   });
   socket.on("addtochat", function(newdat) {
     data =  data + newdat + "<br>"
@@ -86,5 +85,8 @@ io.on("connection", function(socket){
     } else {
       socket.emit("invalid-room");
     }
+  });
+  socket.on('disconnect', function () {
+    logger.info("Discon")
   });
 });
