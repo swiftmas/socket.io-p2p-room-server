@@ -1,0 +1,30 @@
+:root{
+   --Bluez: #2D7DD2;
+   --Greenz: #97CC04;
+   --Yellowz: #EEB902;
+   --Orangez: #F45D01;
+   --Greyz: #474647;
+}
+
+#muzak {
+    border: 3px solid var(--Greyz);
+    padding: 10px;
+}
+.center{
+    margin: auto;
+    text-align: center;
+}
+.stop {
+    background-color: var(--Orangez);
+}
+.start {
+    background-color: var(--Greenz);
+}
+.reset{
+    background-color: var(--Bluez);
+}
+html{
+    background: #ff00cc;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #333399, #ff00cc);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #333399, #ff00cc); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
