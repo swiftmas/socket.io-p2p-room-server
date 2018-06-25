@@ -13,22 +13,60 @@
   <script src="/kek-rr/buffer-loader.js"></script>
 </head>
 <body>
-1. <a href="#" onclick="socket.emit('create-room', 'room1');">Create Room1</a></br>
-2.<a href="#" onclick="socket.emit('join-room', 'room1');">join Room1</a>
-<br>
-<input type="button" value="ResumeAll" onclick="context.resume()"/>
-<input type="button" value="PauseAll" onclick="context.suspend()"/>
 
-
-<br>
-<div id="chatbox"></div>
-<div id="chatText"></div>
+  <div id="chatNStuff">
+    
+    <div>
+      <div id="chatbox"></div>
+      <div id="chatText"></div>
         <input name="usrmsg" type="text" id="usrmsg" size="63" />
         <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
-</div>
-<div>
-  <canvas id="visi" width="500" height="250"></canvas>
+    </div>
+  
+
+  <ol>
+    <li><a href="#" onclick="socket.emit('create-room', 'room1');">Create Room1</a></li>
+    <li><a href="#" onclick="socket.emit('join-room', 'room1');">join Room1</a></li>
+  </ol>
 
 </div>
+
+  <hr>
+  <div style="display: inline-block; float: left;">
+    <table>
+      <thead>
+        <tr>
+          <th>Track - 1</th>
+          <th>Track - 2</th>
+          <th>ALL TRAKZ</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><input type="button" value="stop1" onclick="stop(1)"/></td>
+          <td><input type="button" value="stop2" onclick="stop(2)"/></td>
+          <td><em><input type="button" value="stopAll" onclick="stopall()"/></em></td>
+        </tr>
+        <tr>
+          <td><input type="button" value="start1" onclick="start(1)"/></td>
+          <td><input type="button" value="start2" onclick="start(2)"/></td>
+          <td><em><input type="button" value="startAll" onclick="startBoth()"/></em></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><input type="button" value="Reset" onclick="reset()"/></td>
+          <!-- <td><input type="file" id="track1" onchange="handleFiles(this.files)"></td>
+          <td> <input type="file" id="track2" onchange="handleFiles(this.files)"></td> -->
+        </tr>
+        </tbody>
+    </table>
+  </div>
+  <<div style="display: inline-block; float: right;">>
+      <canvas id="visi" width="500" height="250"></canvas>
+    </div>
+
+  <hr>
+
 </body>
 </html>

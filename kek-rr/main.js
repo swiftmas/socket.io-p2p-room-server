@@ -21,28 +21,27 @@ function init() {
   source1 = context.createBufferSource();
   source2 = context.createBufferSource();
   source1.connect(analyser);
-  // source2.connect(analyser);
-  source1.connect(context.destination);
-  source2.connect(context.destination);
+  source2.connect(analyser);
+  analyser.connect(context.destination);
+  // source2.connect(context.destination);
 
   analyser.fftSize = 2048;
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
   analyser.getByteTimeDomainData(dataArray);
-
   canvas=document.getElementById("visi");
   canvasCtx=canvas.getContext("2d");
   WIDTH = 500;
   HEIGHT = 300;
-  canvasCtx.fillRect(0, 0, 300, 150);
+  // canvasCtx.fillRect(0, 0, 300, 150);
   // canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
 
   bufferLoader = new BufferLoader(
     context,
     [
-      '/data/1.wav',
-      '/data/2.wav',
+      '/data/drum.mp3',
+      '/data/synth.mp3',
     ],
     finishedLoading
     );
@@ -50,20 +49,51 @@ function init() {
   bufferLoader.load();
 }
 
-function flip(){
-  if(playing){
-    context.resume()
-  }else{
-    context.suspend()
+function stop(oneOrTwo){
+  switch(oneOrTwo) {
+    case 1:
+        source1.stop()
+        break;
+    case 2:
+        source2.stop()
+        break;
+    default:
+        console.error("FATAL ERROR: UR A SKRUB... ONE OR TWO MEANS ONE OR TWO")
   }
+}
+function start(oneOrTwo){
+  switch(oneOrTwo) {
+    case 1:
+        source1.start(0)
+        break;
+    case 2:
+        source2.start(0)
+        break;
+    default:
+        console.error("FATAL ERROR: UR A SKRUB... ONE OR TWO MEANS ONE OR TWO")
+  }
+}
+  
+function startBoth(){
+  source1.start()
+  source2.start()
+}
+
+function stopall(){
+  source1.stop(0);
+  source2.stop(0);
+}
+function reset(){
+  stopall();
+  init();
 }
 
 function finishedLoading(bufferList) {
   // Create two sources and play them both together.
   source1.buffer = bufferList[0];
   source2.buffer = bufferList[1];
-  source1.start(0);
-  source2.start(0);
+  // source1.start(0);
+  // source2.start(0);
   draw();
 
 }
