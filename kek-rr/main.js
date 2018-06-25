@@ -31,8 +31,8 @@ function init() {
   analyser.getByteTimeDomainData(dataArray);
   canvas=document.getElementById("canvaz");
   canvasCtx=canvas.getContext("2d");
-  WIDTH = 500;
-  HEIGHT = 300;
+  WIDTH = window.innerHeight;
+  HEIGHT = window.innerWidth * .25;
   // canvasCtx.fillRect(0, 0, 300, 150);
   // canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -101,10 +101,12 @@ function finishedLoading(bufferList) {
 function draw() {
   drawVisual = requestAnimationFrame(draw);
   analyser.getByteTimeDomainData(dataArray);
-  canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+  canvasCtx.canvas.width  = window.innerWidth;
+  canvasCtx.canvas.height = window.innerHeight * .25;
+  canvasCtx.fillStyle = '#474647';
   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
   canvasCtx.lineWidth = 2;
-  canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+  canvasCtx.strokeStyle = '#EEB902';
   canvasCtx.beginPath();
   var sliceWidth = WIDTH * 1.0 / bufferLength;
   var x = 0;
