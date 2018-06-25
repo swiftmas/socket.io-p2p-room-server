@@ -29,7 +29,7 @@ function init() {
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
   analyser.getByteTimeDomainData(dataArray);
-  canvas=document.getElementById("visi");
+  canvas=document.getElementById("canvaz");
   canvasCtx=canvas.getContext("2d");
   WIDTH = 500;
   HEIGHT = 300;
@@ -75,25 +75,16 @@ function start(oneAndOrTwo){
         source2.start(0)
         break;
     case 12:
-      source1.stop();
-      source2.stop();
+      source1.start(0);
+      source2.start(0);
       break; 
     default:
         console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
   }
 }
   
-function startBoth(){
-  source1.start()
-  source2.start()
-}
-
-function stopall(){
-  source1.stop(0);
-  source2.stop(0);
-}
 function reset(){
-  stopall();
+  stop(12);
   init();
 }
 
@@ -110,15 +101,11 @@ function finishedLoading(bufferList) {
 function draw() {
   drawVisual = requestAnimationFrame(draw);
   analyser.getByteTimeDomainData(dataArray);
-
   canvasCtx.fillStyle = 'rgb(200, 200, 200)';
   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
   canvasCtx.lineWidth = 2;
   canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
-
   canvasCtx.beginPath();
-
   var sliceWidth = WIDTH * 1.0 / bufferLength;
   var x = 0;
 
@@ -135,6 +122,7 @@ function draw() {
 
     x += sliceWidth;
   }
+
   canvasCtx.lineTo(canvas.width, canvas.height/2);
   canvasCtx.stroke();
 };
