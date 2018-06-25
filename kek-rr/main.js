@@ -10,6 +10,7 @@ socket.on('data', function(newdata) {
 window.onload = init;
 var context;
 var bufferLoader;
+var playing = false;
 
 function init() {
   // Fix up prefixing
@@ -26,6 +27,14 @@ function init() {
     );
 
   bufferLoader.load();
+}
+
+function flip(){
+  if(playing){
+    context.resume()
+  }else{
+    context.suspend()
+  }
 }
 
 function finishedLoading(bufferList) {
