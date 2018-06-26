@@ -6,6 +6,8 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 
+var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/1.wav","offset":[0,0,0,0,0]},{"file":"/data/2.wav","offset":[1,0,0,0,0]}]}],"songName":"Song1","bpm":120}
+var bufferData = {"analysers": [], "sources": [] }
 
 window.onload = init;
 var context;
@@ -13,41 +15,54 @@ var bufferLoader;
 var playing = false;
 
 function init() {
-  // Fix up prefixing
-  //Wire it up
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
-  analyser = context.createAnalyser();
-  source1 = context.createBufferSource();
-  source2 = context.createBufferSource();
-  source1.connect(analyser);
-  source2.connect(analyser);
-  analyser.connect(context.destination);
-  // source2.connect(context.destination);
-
-  analyser.fftSize = 2048;
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-  analyser.getByteTimeDomainData(dataArray);
-  canvas=document.getElementById("canvaz");
-  canvasCtx=canvas.getContext("2d");
-  WIDTH = window.innerHeight;
-  HEIGHT = window.innerWidth * .25;
-  // canvasCtx.fillRect(0, 0, 300, 150);
-  // canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-
+	var audioToBuffer = [];
+	var curIndex = 0;
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			audioToBuffer.push(songData.tracks[i].audio[af].file);
+			songData.tracks[i].audio[af].index = curIndex;
+			++curIndex;
+		}
+	}
 
   bufferLoader = new BufferLoader(
     context,
-    [
-      '/data/drum.mp3',
-      '/data/synth.mp3',
-    ],
+		audioToBuffer,
     finishedLoading
-    );
+  );
 
   bufferLoader.load();
 }
+
+
+function finishedLoading(bufferList) {
+	var curIndex = 0;
+	for (var i=0; i<songData.tracks.length; ++i) {
+		bufferData.analysers[i] = context.createAnalyser();
+		for (var s=0; s<songData.tracks[i].audio.length; ++s){
+			bufferData.sources[s] = context.createBufferSource();
+			bufferData.sources[s].buffer = bufferList[curIndex]
+			bufferData.sources[s].connect(bufferData.analysers[i])
+			++curIndex;
+		}
+	}
+	bufferData.analysers[0].connect(context.destination);
+	bufferData.analysers[0].fftSize = 2048;
+	bufferLength = bufferData.analysers[0].frequencyBinCount;
+	dataArray = new Uint8Array(bufferLength);
+	bufferData.analysers[0].getByteTimeDomainData(dataArray);
+	canvas=document.getElementById("canvaz");
+	canvasCtx=canvas.getContext("2d");
+	WIDTH = window.innerHeight;
+	HEIGHT = window.innerWidth * .25;
+	// canvasCtx.fillRect(0, 0, 300, 150);
+	// canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  draw();
+
+}
+
 
 function stop(oneAndOrTwo){
   switch(oneAndOrTwo) {
@@ -60,9 +75,9 @@ function stop(oneAndOrTwo){
     case 12:
       source1.stop();
       source2.stop();
-      break; 
+      break;
     default:
-      break; 
+      break;
       console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
   }
 }
@@ -77,30 +92,21 @@ function start(oneAndOrTwo){
     case 12:
       source1.start(0);
       source2.start(0);
-      break; 
+      break;
     default:
         console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
   }
 }
-  
+
 function reset(){
   stop(12);
   init();
 }
 
-function finishedLoading(bufferList) {
-  // Create two sources and play them both together.
-  source1.buffer = bufferList[0];
-  source2.buffer = bufferList[1];
-  // source1.start(0);
-  // source2.start(0);
-  draw();
-
-}
 
 function draw() {
   drawVisual = requestAnimationFrame(draw);
-  analyser.getByteTimeDomainData(dataArray);
+  bufferData.analysers[0].getByteTimeDomainData(dataArray);
   canvasCtx.canvas.width  = window.innerWidth;
   canvasCtx.canvas.height = window.innerHeight * .25;
   canvasCtx.fillStyle = '#474647';
@@ -129,19 +135,6 @@ function draw() {
   canvasCtx.stroke();
 };
 
-function newTrack(file, trackNo){
-  console.log("\nNew Track INC. \nTrack" + trackNo + " - Path:" + file);
-  //TODO LOAD THIS INTO THE BUFFERZ and reset
-  //look at buffer loader and stuff
-  //wow
-  if(trackNo == 1){
-    source1.buffer = file;
-  }
-  else{
-    source2.buffer = file;
-  }
-  reset();
-  };
-  
-  // reader.readAsText(evt.target.files[0]);
 
+
+  // reader.readAsText(evt.target.files[0]);
