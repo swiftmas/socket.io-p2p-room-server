@@ -6,7 +6,7 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 
-var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]},{"file":"/data/synth.mp3","offset":[1,0,0,0,0]}]}],"songName":"Song1","bpm":120}
+var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]},{"file":"/data/synth.mp3","offset":[4,1,0,0,0]}]}],"songName":"Song1","bpm":140}
 var bufferData = {"analysers": [], "tracks": [] }
 
 window.onload = init;
@@ -40,8 +40,8 @@ function init() {
 
 function beatToTime(beat){
 	var bpm = songData.bpm;
-	var min = 60000;
-	var minbpm = 60000/bpm
+	var min = 60;
+	var minbpm = min/bpm
 	var timeTotal = 0;
 	timeTotal += beat[0] * (4 * minbpm)
 	timeTotal += beat[1] * (1 * minbpm)
@@ -80,43 +80,32 @@ function finishedLoading(bufferList, track) {
 
 
 function stop(oneAndOrTwo){
-  switch(oneAndOrTwo) {
-    case 1:
-      bufferData.tracks[0].sources[0].stop()
-      break;
-    case 2:
-      bufferData.tracks[0].sources[1].stop()
-      break;
-    case 12:
-      bufferData.tracks[0].sources[0].stop();
-      bufferData.tracks[0].sources[1].stop();
-      break;
-    default:
-      break;
-      console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
-  }
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			bufferData.tracks[i].sources[af].suspend()
+		}
+	};
 }
 function start(oneAndOrTwo){
-  switch(oneAndOrTwo) {
-    case 1:
-        bufferData.tracks[0].sources[0].start(0)
-        break;
-    case 2:
-        bufferData.tracks[0].sources[1].start(0)
-        break;
-    case 12:
-      bufferData.tracks[0].sources[0].start(0);
-      bufferData.tracks[0].sources[1].start(0);
-      break;
-    default:
-        console.error("FATAL ERROR: UR A SKRUB... oneAndOrTwo MEANS ONE AND/OR TWO")
-  }
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			console.log("offset: ", offset)
+			bufferData.tracks[i].sources[af].start(offset)
+		}
+	};
 }
 
-function reset(){
-  stop(12);
-  init();
+function reset(oneAndOrTwo){
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			console.log("offset: ", offset)
+			bufferData.tracks[i].sources[af].resume()
+		}
+	};
 }
+
 
 
 function draw() {
