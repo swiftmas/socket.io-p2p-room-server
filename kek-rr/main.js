@@ -58,6 +58,7 @@ function finishedLoading(bufferList, track) {
 	for (var s=0; s<bufferList.length; ++s){
 		bufferData.tracks[track].sources[s] = context.createBufferSource();
 		bufferData.tracks[track].sources[s].buffer = bufferList[curIndex]
+		bufferData.tracks[track].sources[s].connect(bufferData.tracks[track].sources[s].context.destination)
 		bufferData.tracks[track].sources[s].connect(bufferData.analysers[track])
 		++curIndex;
 	}
@@ -82,16 +83,27 @@ function finishedLoading(bufferList, track) {
 function stop(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			bufferData.tracks[i].sources[af].suspend()
+			bufferData.tracks[i].sources[af].context.suspend()
 		}
 	};
 }
+
 function start(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
 			var offset = beatToTime(songData.tracks[i].audio[af].offset)
-			console.log("offset: ", offset)
+			console.log("Start: ", offset)
 			bufferData.tracks[i].sources[af].start(offset)
+		}
+	};
+}
+
+function seek(time){
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			console.log("SEEKTO: ", time)
+			bufferData.tracks[i].sources[af].context._playbackTime = time
 		}
 	};
 }
@@ -100,8 +112,8 @@ function reset(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
 			var offset = beatToTime(songData.tracks[i].audio[af].offset)
-			console.log("offset: ", offset)
-			bufferData.tracks[i].sources[af].resume()
+			console.log("resume: ", offset)
+			bufferData.tracks[i].sources[af].context.resume()
 		}
 	};
 }
