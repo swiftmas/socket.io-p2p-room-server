@@ -7,7 +7,7 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 //SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]},{"file":"/data/synth.mp3","offset":[4,1,0,0,0]}]}],"songName":"Song1","bpm":140}
+var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]},{"file":"/data/synth.mp3","offset":[1,0,0,0,0]}]}],"songName":"Song1","bpm":140}
 var bufferData = {"analysers": [], "tracks": [] }
 
 window.onload = init;
@@ -71,7 +71,7 @@ function beatToTime(beat){
 	timeTotal += beat[2] * (minbpm/4)
 	timeTotal += beat[3] * (minbpm/16)
 	timeTotal += beat[4] * (minbpm/64)
-	return parseInt(timeTotal);
+	return timeTotal;
 }
 
 
