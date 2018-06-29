@@ -7,7 +7,7 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 //SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","offset":[1,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":178}
+var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","offset":[1,0,0,0,0]},{"file":"/data/synth.mp3","offset":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
 var bufferData = {"analysers": [], "tracks": [] }
 
 window.onload = init;
