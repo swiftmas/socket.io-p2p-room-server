@@ -14,9 +14,14 @@ window.onload = init;
 var context;
 var bufferLoader;
 var playing = false;
+var canvas = document.getElementById('canvaz');
+var ctx = canvas.getContext('2d');
+
 
 //SETUP LOAD ALL THE AUDIO
 function init() {
+canvas.width = songData.end * 10
+canvas.height = songData.tracks.length * 10
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
 	for (var i=0; i<songData.tracks.length; ++i) {
@@ -27,6 +32,7 @@ function init() {
 			audioToBuffer.push(songData.tracks[i].audio[af].file);
 			songData.tracks[i].audio[af].index = curIndex;
 			++curIndex;
+
 		}
 		bufferData.tracks[i].buffer = new BufferLoader(
 			context,
