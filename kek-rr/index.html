@@ -11,8 +11,6 @@
   <link rel="stylesheet" type="text/css" href="skeleton.css">
   <link rel="stylesheet" type="text/css" href="theme.css">
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/kek-rr/main.js"></script>
-  <script src="/kek-rr/buffer-loader.js"></script>
 </head>
 <body>
 
@@ -38,11 +36,10 @@
   <div>
     <table class="center" id="mixer">
       <thead>
-        <tr>
-          <th>will</th>
-          <th>fix</th>
-          <th>this</th>
-          <th>this</th>
+        <tr class="center">
+          <td>
+          <h2 id=currentTime></h2>
+        </td>
         </tr>
         </thead>
         <tbody>
@@ -50,18 +47,20 @@
           <td><button class="start" onclick="start(1)">start</button></td>
           <td><button class="reset" onclick="reset(12)">Play</button></td>
           <td><button class="stop" onclick="stop(2)">Pause</button></td>
-          <td><button class="start" onclick="seek(beatToTime([5,0,0,0,0]))">Seek to 2</button></td>
+          <td><button class="start" onclick="seek(beatToTime([document.getElementById('seekInput').value,0,0,0,0]))">Seek to 2</button><input id="seekInput"></td>
 
         </tr>
         </tbody>
     </table>
   </div>
-  <div>
-      <canvas class="center" id="canvaz"></canvas>
-    </div>
+  <div class="canvas-container">
+    <canvas class="center" id="canvaz"></canvas>
+  </div>
 
   <hr>
 </div>
 
 </body>
+<script src="/kek-rr/main.js"></script>
+<script src="/kek-rr/buffer-loader.js"></script>
 </html>

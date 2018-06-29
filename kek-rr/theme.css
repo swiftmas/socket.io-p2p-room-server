@@ -14,6 +14,12 @@
     margin: auto;
     text-align: center;
 }
+
+#currentTime{
+    margin: auto;
+    text-align: left;
+}
+
 .stop {
     background-color: var(--Orangez);
 }
@@ -37,7 +43,11 @@ div{
     margin: 0px;
 }
 canvas {
-    position: absolute;
+
+}
+
+.canvas-container {
     width: 100%;
-    left: 0px;
+    overflow-x: auto;
+    white-space: nowrap;
 }

@@ -7,21 +7,20 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 //SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Track1","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]},{"file":"/data/synth.mp3","offset":[1,0,0,0,0]}]}],"songName":"Song1","bpm":140}
+var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","offset":[1,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":178}
 var bufferData = {"analysers": [], "tracks": [] }
 
 window.onload = init;
 var context;
 var bufferLoader;
 var playing = false;
+var playTime = 0;
 var canvas = document.getElementById('canvaz');
 var ctx = canvas.getContext('2d');
 
 
 //SETUP LOAD ALL THE AUDIO
 function init() {
-canvas.width = songData.end * 10
-canvas.height = songData.tracks.length * 10
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
 	for (var i=0; i<songData.tracks.length; ++i) {
@@ -32,7 +31,6 @@ canvas.height = songData.tracks.length * 10
 			audioToBuffer.push(songData.tracks[i].audio[af].file);
 			songData.tracks[i].audio[af].index = curIndex;
 			++curIndex;
-
 		}
 		bufferData.tracks[i].buffer = new BufferLoader(
 			context,
@@ -52,6 +50,9 @@ function finishedLoading(bufferList, track) {
 		bufferData.tracks[track].sources[s].buffer = bufferList[curIndex]
 		bufferData.tracks[track].sources[s].connect(bufferData.tracks[track].sources[s].context.destination)
 		++curIndex;
+		if (songData.tracks.length == bufferData.tracks.length){
+					startIT();
+		};
 		bufferData.tracks[track].sources[s].start();
 		bufferData.tracks[track].sources[s].stop();
 	}
@@ -63,7 +64,7 @@ function playSound(track, buffer, time, offset) {
 	bufferData.tracks[track].sources[buffer].buffer = bufferData.tracks[track].buffer.bufferList[buffer]
 	bufferData.tracks[track].sources[buffer].connect(bufferData.tracks[track].sources[buffer].context.destination)
 	bufferData.tracks[track].sources[buffer].start(time, offset)
-	console.log("PlayFunction:", time, offset, )
+	console.log("PlayFunction:", time, offset)
 }
 
 //GLOBAL MEASURE OF TIME
@@ -95,9 +96,12 @@ function start(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
 			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			try {
 			bufferData.tracks[i].sources[af].stop(0)
+		} catch(err) {}
 			var now = context.currentTime;
 			playSound(i,af,now + offset, 0)
+			playTime = context.currentTime
 		}
 	};
 }
@@ -106,7 +110,9 @@ function seek(time){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
 			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			try {
 			bufferData.tracks[i].sources[af].stop(0)
+		  } catch(err) {}
 			var now = context.currentTime;
 		  offset = offset - time
 			if (offset < 0){
@@ -114,6 +120,7 @@ function seek(time){
 			} else {
 				playSound(i,af,now+offset, 0)
 			}
+			playTime =  context.currentTime - time
 		}
 	};
 }
@@ -125,4 +132,34 @@ function reset(oneAndOrTwo){
 			bufferData.tracks[i].sources[af].context.resume()
 		}
 	};
+}
+
+function timeToBeat(time, inc){
+	 return parseInt(time / (inc*(songData.bpm/60)))
+}
+
+function startIT(){
+	setInterval(function(){
+		draw()
+	}, 32);
+}
+
+function draw(){
+	canvas.width = songData.end * 16
+	canvas.height = songData.tracks.length * 22
+	for (var i=0; i<songData.tracks.length; ++i) {
+		for (var af=0; af<songData.tracks[i].audio.length; ++af){
+			var beat = songData.tracks[i].audio[af].offset
+			var tlen = timeToBeat(bufferData.tracks[i].buffer.bufferList[af].duration, 4)
+			var timeTotal = 0;
+			timeTotal += beat[0] * 16
+			timeTotal += beat[1] * 4
+			timeTotal += beat[2] * 1
+			ctx.fillStyle = "Blue"
+			ctx.fillRect(timeTotal,i*22,tlen*64,20);
+			ctx.fillStyle = "Black"
+			ctx.fillRect(timeToBeat((context.currentTime - playTime), (1/16)),0,1,22*songData.tracks.length)
+			document.getElementById('currentTime').innerHTML = ((context.currentTime - playTime)/ (4*(songData.bpm/60))).toFixed(3)
+		}
+	}
 }
