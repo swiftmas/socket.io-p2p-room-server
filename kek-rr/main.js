@@ -17,12 +17,24 @@ var playing = false;
 var playTime = 0;
 var canvas = document.getElementById('canvaz');
 var ctx = canvas.getContext('2d');
-
+//GIVE BUFFER TIME
+var slop = .01
 
 //SETUP LOAD ALL THE AUDIO
-function init() {
+function init(a) {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
+  //----- This part lets us define an optional param to only reload one of the tracks. ------
+  // So a doesnt have to be passed, we can call just init() unless we want a specific track /
+  a = a || "all";
+  if ( a == "all"){
+  var i = 0;
+    upperBound=songData.tracks.length
+  } else {
+    var i = a;
+    upperBound = a + 1;
+  }
+  //---- --- --  ----------------------------------------------------------------------------
 	for (var i=0; i<songData.tracks.length; ++i) {
 		bufferData.tracks[i]={"sources": [], "buffer": [] };
 		var audioToBuffer = [];
@@ -64,12 +76,12 @@ function playSound(track, buffer, time, offset) {
 	bufferData.tracks[track].sources[buffer].buffer = bufferData.tracks[track].buffer.bufferList[buffer]
 	bufferData.tracks[track].sources[buffer].connect(bufferData.tracks[track].sources[buffer].context.destination)
 	bufferData.tracks[track].sources[buffer].start(time, offset)
-	console.log("PlayFunction:", time, offset)
+	console.log("PlayFunction:", time + slop, offset)
 }
 
 //GLOBAL MEASURE OF TIME
 function beatToTime(beat){
-	var bpm = songData.bpm;
+	var= songData.bpm;
 	var min = 60;
 	var minbpm = min/bpm
 	var timeTotal = 0;
@@ -134,7 +146,7 @@ function reset(oneAndOrTwo){
 	};
 }
 
-function timeToBeat(time, inc){
+function timeToBeat(time){
 	 return parseInt(time / (inc*(songData.bpm/60)))
 }
 
