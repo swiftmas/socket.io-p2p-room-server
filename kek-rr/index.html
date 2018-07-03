@@ -14,40 +14,17 @@
 </head>
 <body>
 
-  <div id="chatNStuff">
 
-    <div>
-      <div id="chatbox"></div>
-      <div id="chatText"></div>
-        <input name="usrmsg" type="text" id="usrmsg" size="63" />
-        <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
-    </div>
-
-  <ol>
-    <li><a href="#" onclick="socket.emit('create-room', 'room1');">Create Room1</a></li>
-    <li><a href="#" onclick="socket.emit('join-room', 'room1');">join Room1</a></li>
-  </ol>
-
-</div>
-
-<div class="center" id="muzak">
-
-  <hr>
+<div class="left" id="muzak">
   <div>
-    <table class="center" id="mixer">
-      <thead>
-        <tr class="center">
-          <td>
-          <h2 id=currentTime></h2>
-        </td>
-        </tr>
-        </thead>
+    <table class="left" id="mixer">
         <tbody>
         <tr>
+          <td><button id=currentTime></button></td>
           <td><button class="start" onclick="start(1)">start</button></td>
-          <td><button class="reset" onclick="reset(12)">Play</button></td>
+          <td><button class="reset" onclick="resume(12)">Play</button></td>
           <td><button class="stop" onclick="stop(2)">Pause</button></td>
-          <td><button class="start" onclick="seek([document.getElementById('seekInput').value,0,0,0,0])">Seek to 2</button><input id="seekInput"></td>
+          <td><button class="start" onclick="seek([document.getElementById('seekInput').value,0,0,0,0])">Seek to</button><input id="seekInput"></td>
 
         </tr>
         </tbody>
@@ -58,6 +35,45 @@
   </div>
 
   <hr>
+</div>
+
+
+<div id="chatNStuff">
+
+
+
+  <section id="chatbox" class="module">
+
+    <header class="top-bar" onclick="if(document.getElementById('chatbox').bottom == 0){document.getElementById('chatbox').bottom = -450px} else {document.getElementById('chatbox').bottom = 0px}">
+
+      <div class="left">
+        <span class="icon typicons-message"></span>
+        <h1>ChatRoom</h1>
+      </div>
+
+      <div class="right">
+        <span class="icon typicons-minus"></span>
+        <span class="icon typicons-times"></span>
+      </div>
+
+    </header>
+
+    <ol class="discussion">
+      <li class="other">
+        <div class="avatar">
+          <img src="#" />
+        </div>
+        <div id="chatText" class="messages">
+          <p>Talk here to collaborate</p>
+          <p>with everyone else in the room</p>
+        </div>
+      </li>
+      <input name="usrmsg" type="text" id="usrmsg" size="16" />
+      <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
+    </ol>
+  </section>
+
+
 </div>
 
 </body>
