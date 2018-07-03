@@ -62,7 +62,7 @@ function finishedLoading(bufferList, track) {
 		bufferData.tracks[track].sources[s].connect(bufferData.tracks[track].sources[s].context.destination)
 		// This will setup our timers so that we use real time instead of calling the function every time
 		songData.tracks[track].audio[s].init_time = globalTime("formal", songData.tracks[track].audio[s].init_formal, "time")
-                songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
+    songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
 		if (songData.tracks.length == bufferData.tracks.length){
 					startIT();
 		};
@@ -83,35 +83,37 @@ function playSound(track, buffer, time, offset) {
 //GLOBAL CONVERTER OF TIME
 function globalTime(input, value, output){
 	if (input == "formal" && output =="time"){
-		var bpm = songData.bpm;
-		var minbpm = 4 * (60/bpm)
-		var timeTotal = 0;
-		timeTotal += value[0] * minbpm
-		timeTotal += value[1] * (minbpm/4)
-		timeTotal += value[2] * (minbpm/16)
-		timeTotal += value[3] * (minbpm/64)
-		timeTotal += value[4] * (minbpm/256)
-		return timeTotal;
+			var bpm = songData.bpm;
+			var minbpm = 4 * (60/bpm)
+			var timeTotal = 0;
+			timeTotal += value[0] * minbpm
+			timeTotal += value[1] * (minbpm/4)
+			timeTotal += value[2] * (minbpm/16)
+			timeTotal += value[3] * (minbpm/64)
+			timeTotal += value[4] * (minbpm/256)
+			return timeTotal;
 	} else if (input == "formal" && output =="128"){
-                var timeTotal = 0;
-                timeTotal += value[0] * 256
-                timeTotal += value[1] * 64
-                timeTotal += value[2] * 16
-                timeTotal += value[3] * 4
-                timeTotal += value[4]
-                return timeTotal;
-	} else if (input == time && output == formal){
-		var bpm = songData.bpm;
-                var minbpm = 4 * (60/bpm)
-		var timeTotal = [];
-                timeFormal[0] =  parseInt(time/minpbm);
-		time = time - (timeFormal[0] * minpbm);
-                timeFormal[1] =  parseInt(time/minpbm);
-                time = time - (timeFormal[0] * minpbm)
-                timeFormal[2] =  parseInt(time/minpbm);
-                timeFormal[3] =  parseInt(time/minpbm);
-                timeFormal[4] =  parseInt(time/minpbm);
-                return timeFormal;
+	    var timeTotal = 0;
+	    timeTotal += value[0] * 256
+	    timeTotal += value[1] * 64
+	    timeTotal += value[2] * 16
+	    timeTotal += value[3] * 4
+	    timeTotal += value[4]
+	    return timeTotal;
+	} else if (input == "time" && output == "formal"){
+			var bpm = songData.bpm;
+	    var minbpm = 4 * (60/bpm)
+			var timeFormal = [];
+	    timeFormal[0] =  parseInt(value/minbpm);
+			value = value - (timeFormal[0] * minbpm);
+	    timeFormal[1] =  parseInt(value/minbpm/4);
+	    value = value - (timeFormal[1] * (minbpm/4))
+	    timeFormal[2] =  parseInt(value/minbpm/16);
+			value = value - (timeFormal[1] * (minbpm/16))
+	    timeFormal[3] =  parseInt(value/minbpm/64);
+			value = value - (timeFormal[1] * (minbpm/64))
+	    timeFormal[4] =  parseInt(value/minbpm/256);
+	    return timeFormal;
 	}
 
 }
@@ -182,21 +184,18 @@ function startIT(){
 }
 
 function draw(){
-	canvas.width = songData.end * 16
-	canvas.height = songData.tracks.length * 22
+	canvas.width = songData.end * 10
+	canvas.height = songData.tracks.length * 62
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var beat = songData.tracks[i].audio[af].init_formal
-			var tlen = timeToBeat(bufferData.tracks[i].buffer.bufferList[af].duration, 4)
-			var timeTotal = 0;
-			timeTotal += beat[0] * 16
-			timeTotal += beat[1] * 4
-			timeTotal += beat[2] * 1
+			var timeTotal = songData.tracks[i].audio[af].init_formal
+			var tlen = globalTime("time", bufferData.tracks[i].buffer.bufferList[af].duration, "formal")
 			ctx.fillStyle = "Blue"
-			ctx.fillRect(timeTotal,i*22,tlen*64,20);
+			ctx.fillRect(timeTotal[0]*10,i*62,tlen[0]*10,60);
 			ctx.fillStyle = "Black"
-			ctx.fillRect(timeToBeat((context.currentTime - playTime), (1/16)),0,1,22*songData.tracks.length)
-			document.getElementById('currentTime').innerHTML = ((context.currentTime - playTime)/ (4*(songData.bpm/60))).toFixed(3)
+			var newtime = globalTime("time",(context.currentTime - playTime),"formal")
+			ctx.fillRect(newtime[0]*10,0,1,62*songData.tracks.length)
+			document.getElementById('currentTime').innerHTML = newtime[0] + " " + newtime[1] + " " + newtime[2]
 		}
 	}
 }
