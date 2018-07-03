@@ -7,7 +7,7 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 //SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","offset":[1,0,0,0,0]},{"file":"/data/synth.mp3","offset":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","offset":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
+var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","init_formal":[1,0,0,0,0]},{"file":"/data/synth.mp3","init_formal":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","init_formal":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
 var bufferData = {"analysers": [], "tracks": [] }
 
 window.onload = init;
@@ -56,12 +56,13 @@ function init(a) {
 // RELEASES THE PROMISE FOR THE BUFFERS AND SIGNALS THAT PLAYBACK CAN STSART. Plays through once to alleviate need of if/thens to make sure the buffers exist.
 function finishedLoading(bufferList, track) {
 	console.log(track, "has loaded")
-	var curIndex = 0;
 	for (var s=0; s<bufferList.length; ++s){
 		bufferData.tracks[track].sources[s] = context.createBufferSource();
-		bufferData.tracks[track].sources[s].buffer = bufferList[curIndex]
+		bufferData.tracks[track].sources[s].buffer = bufferList[s]
 		bufferData.tracks[track].sources[s].connect(bufferData.tracks[track].sources[s].context.destination)
-		++curIndex;
+		// This will setup our timers so that we use real time instead of calling the function every time
+		songData.tracks[track].audio[s].init_time = globalTime("formal", songData.tracks[track].audio[s].init_formal, "time")
+                songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
 		if (songData.tracks.length == bufferData.tracks.length){
 					startIT();
 		};
@@ -79,18 +80,40 @@ function playSound(track, buffer, time, offset) {
 	console.log("PlayFunction:", time + slop, offset)
 }
 
-//GLOBAL MEASURE OF TIME
-function beatToTime(beat){
-	var= songData.bpm;
-	var min = 60;
-	var minbpm = min/bpm
-	var timeTotal = 0;
-	timeTotal += beat[0] * (4 * minbpm)
-	timeTotal += beat[1] * (1 * minbpm)
-	timeTotal += beat[2] * (minbpm/4)
-	timeTotal += beat[3] * (minbpm/16)
-	timeTotal += beat[4] * (minbpm/64)
-	return timeTotal;
+//GLOBAL CONVERTER OF TIME
+function globalTime(input, value, output){
+	if (input == "formal" && output =="time"){
+		var bpm = songData.bpm;
+		var minbpm = 4 * (60/bpm)
+		var timeTotal = 0;
+		timeTotal += value[0] * minbpm
+		timeTotal += value[1] * (minbpm/4)
+		timeTotal += value[2] * (minbpm/16)
+		timeTotal += value[3] * (minbpm/64)
+		timeTotal += value[4] * (minbpm/256)
+		return timeTotal;
+	} else if (input == "formal" && output =="128"){
+                var timeTotal = 0;
+                timeTotal += value[0] * 256
+                timeTotal += value[1] * 64
+                timeTotal += value[2] * 16
+                timeTotal += value[3] * 4
+                timeTotal += value[4]
+                return timeTotal;
+	} else if (input == time && output == formal){
+		var bpm = songData.bpm;
+                var minbpm = 4 * (60/bpm)
+		var timeTotal = [];
+                timeFormal[0] =  parseInt(time/minpbm);
+		time = time - (timeFormal[0] * minpbm);
+                timeFormal[1] =  parseInt(time/minpbm);
+                time = time - (timeFormal[0] * minpbm)
+                timeFormal[2] =  parseInt(time/minpbm);
+                timeFormal[3] =  parseInt(time/minpbm);
+                timeFormal[4] =  parseInt(time/minpbm);
+                return timeFormal;
+	}
+
 }
 
 
@@ -107,7 +130,7 @@ function stop(oneAndOrTwo){
 function start(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			var offset = songData.tracks[i].audio[af].init_time
 			try {
 			bufferData.tracks[i].sources[af].stop(0)
 		} catch(err) {}
@@ -119,9 +142,11 @@ function start(oneAndOrTwo){
 }
 
 function seek(time){
+	time = globalTime("formal", time, "time");
+	console.log(time)
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			var offset = songData.tracks[i].audio[af].init_time
 			try {
 			bufferData.tracks[i].sources[af].stop(0)
 		  } catch(err) {}
@@ -140,14 +165,14 @@ function seek(time){
 function reset(oneAndOrTwo){
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var offset = beatToTime(songData.tracks[i].audio[af].offset)
+			var offset = songData.tracks[i].audio[af].init_time
 			bufferData.tracks[i].sources[af].context.resume()
 		}
 	};
 }
 
 function timeToBeat(time){
-	 return parseInt(time / (inc*(songData.bpm/60)))
+	 return parseInt(time / (4*(songData.bpm/60)))
 }
 
 function startIT(){
@@ -161,7 +186,7 @@ function draw(){
 	canvas.height = songData.tracks.length * 22
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var beat = songData.tracks[i].audio[af].offset
+			var beat = songData.tracks[i].audio[af].init_formal
 			var tlen = timeToBeat(bufferData.tracks[i].buffer.bufferList[af].duration, 4)
 			var timeTotal = 0;
 			timeTotal += beat[0] * 16
