@@ -75,6 +75,24 @@ function bufferTracks(a){
   }
 }
 
+function newTrack(trackNo, track) {
+  console.log('new track inc' + trackNo)
+  var fileReader = new FileReader()
+  fileReader.onloadend = function (e) {
+    var arrayBuffer = e.target.result
+    context.decodeAudioData(arrayBuffer).then(function (audioBuffer) {
+      if (trackNo === 1) {
+        source1 = new BuffAudio(context, audioBuffer)
+      } else if (trackNo === 2) {
+        source2 = new BuffAudio(context, audioBuffer)
+      } else {
+        console.error("this, shouldn't happen ever.. use 1 or two for your track number...")
+      }
+    })
+  }
+  fileReader.readAsArrayBuffer(track)
+}
+
 // RELEASES THE PROMISE FOR THE BUFFERS AND SIGNALS THAT PLAYBACK CAN STSART. Plays through once to alleviate need of if/thens to make sure the buffers exist.
 function finishedLoading(bufferList, track) {
 	console.log(track, "has loaded")
