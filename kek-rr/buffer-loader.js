@@ -45,3 +45,48 @@ BufferLoader.prototype.load = function() {
   for (var i = 0; i < this.urlList.length; ++i)
   this.loadBuffer(this.urlList[i], i);
 }
+
+function bufferTracks(a){
+  //----- This part lets us define an optional param to only reload one of the tracks. ------
+  // So a doesnt have to be passed, we can call just init() unless we want a specific track /
+  a = a || "all";
+  if ( a == "all"){
+  var i = 0;
+    upperBound=songData.tracks.length
+  } else {
+    var i = a;
+    upperBound = a + 1;
+  }
+  //---- --- --  ----------------------------------------------------------------------------
+  for (var i=0; i<songData.tracks.length; ++i) {
+    bufferData.tracks[i]={"sources": [], "buffer": [] };
+    var audioToBuffer = [];
+    for (var af=0; af<songData.tracks[i].audio.length; ++af){
+      audioToBuffer.push(songData.tracks[i].audio[af].file);
+      songData.tracks[i].audio[af].index = af;
+    }
+    bufferData.tracks[i].buffer = new BufferLoader(
+      context,
+      audioToBuffer,
+      i, //track number
+      finishedLoading
+    );
+    bufferData.tracks[i].buffer.load();
+  }
+}
+
+// RELEASES THE PROMISE FOR THE BUFFERS AND SIGNALS THAT PLAYBACK CAN STSART. Plays through once to alleviate need of if/thens to make sure the buffers exist.
+function finishedLoading(bufferList, track) {
+	console.log(track, "has loaded")
+	for (var s=0; s<bufferList.length; ++s){
+		bufferData.tracks[track].sources[s] = context.createBufferSource();
+		bufferData.tracks[track].sources[s].buffer = bufferList[s]
+		bufferData.tracks[track].sources[s].connect(bufferData.tracks[track].sources[s].context.destination)
+		// This will setup our timers so that we use real time instead of calling the function every time
+		songData.tracks[track].audio[s].init_time = globalTime("formal", songData.tracks[track].audio[s].init_formal, "time")
+    songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
+		if (songData.tracks.length == bufferData.tracks.length){
+					mainLoop();
+		};
+	}
+}
