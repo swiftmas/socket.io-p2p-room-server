@@ -7,24 +7,25 @@ socket.on('data', function(newdata) {
 	document.getElementById('usrmsg').value = "";
 });
 //SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/synth.mp3","init_formal":[1,0,0,0,0]},{"file":"/data/synth.mp3","init_formal":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"file":"/data/drum.mp3","init_formal":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
+var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"synth","file":"synth.mp3","init_formal":[1,0,0,0,0]},{"name":"synth","file":"synth.mp3","init_formal":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"drum","file":"drum.mp3","init_formal":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
 var bufferData = {"analysers": [], "tracks": [] }
+var originArrayBuffer = {}
+var kekFileData = {};
 
 window.onload = init;
 var context;
-var bufferLoader;
 var playing = false;
 var playTime = 0;
 var canvas = document.getElementById('canvaz');
 var ctx = canvas.getContext('2d');
-//GIVE BUFFER TIME
 var slop = .02
 
 //SETUP LOAD ALL THE AUDIO
 function init() {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
-	bufferTracks();
+	//bufferTracks();
+	loadKek("/data/song.kek", "url")
 }
 
 
@@ -35,12 +36,6 @@ function mainLoop(){
 	}, 60/songData.bpm/4);
 }
 
-document.getElementById('canvaz').onclick(function(e){
-   var parentOffset = $(this).parent().offset();
-   //or $(this).offset(); if you really just want the current element's offset
-   var relX = e.pageX - parentOffset.left;
-   var relY = e.pageY - parentOffset.top;
-});
 
 function draw(){
 	var zoom = 16
