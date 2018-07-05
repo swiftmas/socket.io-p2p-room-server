@@ -6,13 +6,10 @@ function loadKek(file, type){
     request.onload = function() {
         var zip = JSZip.loadAsync(request.response)
         zip.then(function(value) {
-          for (file in value.files){
-            var zipfile = value.file(file).async("blob");
-            zipfile.then(function(value){
-              kekFileData[file] = value
-              console.log(kekFileData);
-              createBuffer(file)
-            })
+          for (var fileName in value.files){
+            var zipfile = value.file(fileName).async("blob");
+            zipfile.then(assignFileDataBlob.bind(value, fileName))
+
           }
         });
     }
@@ -23,12 +20,20 @@ function loadKek(file, type){
   };
 }
 
+function assignFileDataBlob(fileName, value) {
+  kekFileData[fileName] = value
+  console.log(kekFileData);
+  bufferTracks();
+  //createBuffer(fileName)
+}
+
 function createBuffer(fileName) {
   console.log('Creating Buffer for: ' + fileName)
   var fileReader = new FileReader()
   fileReader.onloadend = function (e) {
     originArrayBuffer[fileName] = e.target.result
     context.decodeAudioData(originArrayBuffer[fileName]).then(function (audioBuffer) {
+      bufferData.buffers[fileName] = audioBuffer;
       console.log("Buffer Created for: "+ fileName + " at: originArrayBuffer."+fileName)
     })
   }
@@ -56,18 +61,18 @@ function bufferTracks(a){
       };
     };
   }
+  finishedLoading();
 }
 
 
 // RELEASES THE PROMISE FOR THE BUFFERS AND SIGNALS THAT PLAYBACK CAN STSART. Plays through once to alleviate need of if/thens to make sure the buffers exist.
-function finishedLoading(bufferList, track) {
-	console.log(track, "has loaded")
-	for (var s=0; s<bufferList.length; ++s){
-		// This will setup our timers so that we use real time instead of calling the function every time
-		songData.tracks[track].audio[s].init_time = globalTime("formal", songData.tracks[track].audio[s].init_formal, "time")
-    songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
-		if (songData.tracks.length == bufferData.tracks.length){
-					mainLoop();
-		};
-	}
+function finishedLoading() {
+  for (var track=0; track<songData.tracks.length; ++track) {
+  	for (var s=0; s<songData.tracks[track].audio.length; ++s){
+  		// This will setup our timers so that we use real time instead of calling the function every time
+  		songData.tracks[track].audio[s].init_time = globalTime("formal", songData.tracks[track].audio[s].init_formal, "time")
+      songData.tracks[track].audio[s].init_128 = globalTime("formal", songData.tracks[track].audio[s].init_formal, "128")
+  					mainLoop();
+  	}
+  }
 }

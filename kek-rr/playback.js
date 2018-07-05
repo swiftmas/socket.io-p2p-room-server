@@ -1,9 +1,10 @@
 //CREATE MASETER BUFFER READER FOR SEEKING
-function playSound(track, buffer, time, offset) {
-	bufferData.tracks[track].sources[buffer] = context.createBufferSource();
-	bufferData.tracks[track].sources[buffer].buffer = bufferData.tracks[track].buffer.bufferList[buffer]
-	bufferData.tracks[track].sources[buffer].connect(bufferData.tracks[track].sources[buffer].context.destination)
-	bufferData.tracks[track].sources[buffer].start(time, offset)
+function playSound(track, audioFile, time, offset) {
+  console.log(track, audioFile, time, offset)
+	bufferData.tracks[track].sources[audioFile] = context.createBufferSource();
+	bufferData.tracks[track].sources[audioFile].buffer = bufferData.buffers[songData.tracks[track].audio[audioFile].file]
+	bufferData.tracks[track].sources[audioFile].connect(bufferData.tracks[track].sources[audioFile].context.destination)
+	bufferData.tracks[track].sources[audioFile].start(time + slop, offset)
 	console.log("PlayFunction:", time + slop, offset)
 }
 

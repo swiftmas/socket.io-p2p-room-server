@@ -8,7 +8,7 @@ socket.on('data', function(newdata) {
 });
 //SETUP JSONDATATS
 var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"synth","file":"synth.mp3","init_formal":[1,0,0,0,0]},{"name":"synth","file":"synth.mp3","init_formal":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"drum","file":"drum.mp3","init_formal":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
-var bufferData = {"analysers": [], "tracks": [] }
+var bufferData = {"analysers": [], "tracks": [], "buffers":{}}
 var originArrayBuffer = {}
 var kekFileData = {};
 
@@ -39,13 +39,12 @@ function mainLoop(){
 
 function draw(){
 	var zoom = 16
-
 	canvas.width = songData.end * zoom
 	canvas.height = songData.tracks.length * 62
 	for (var i=0; i<songData.tracks.length; ++i) {
 		for (var af=0; af<songData.tracks[i].audio.length; ++af){
 			var timeTotal = songData.tracks[i].audio[af].init_formal
-			var tlen = globalTime("time", bufferData.tracks[i].buffer.bufferList[af].duration, "formal")
+			var tlen = globalTime("time", bufferData.buffers[songData.tracks[i].audio[af].file].duration, "formal")
 			var my_gradient = ctx.createLinearGradient(0, 0, 0, 170);
 			my_gradient.addColorStop(0, "#2ff3f3");
 			my_gradient.addColorStop(1, "#b400e1");
