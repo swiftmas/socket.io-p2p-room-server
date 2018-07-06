@@ -1,35 +1,29 @@
-//SETUP SOCKSET
-var socket = io.connect();
-var data = ""
-socket.on('data', function(newdata) {
-	data = newdata;
-	document.getElementById('chatText').innerHTML=data
-	document.getElementById('usrmsg').value = "";
-});
-//SETUP JSONDATATS
-var songData = {"tracks":[{"trackName":"Synth","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"synth","file":"synth.mp3","init_formal":[1,0,0,0,0]},{"name":"synth","file":"synth.mp3","init_formal":[49,0,0,0,0]}]},{"trackName":"Drums","currentRevision":"rev1","settings":{"volume":100},"effects":[{"effectName":"Reverb","amount":10}],"audio":[{"name":"drum","file":"drum.mp3","init_formal":[0,0,0,0,0]}]}],"songName":"Song1","bpm":140,"end":177}
-var bufferData = {"analysers": [], "tracks": [], "buffers":{}}
-var originArrayBuffer = {}
-var kekFileData = {};
 
-window.onload = init;
+//SETUP GLOBALS
+var songData = {};
+var bufferData = {"analysers": [], "tracks": [], "buffers":{}};
+var originArrayBuffer = {};
+var kekFileData = {"promiseCount":0, "totalFiles": 1000};
+var chatData = "";
+
+var socket = io.connect();
+var canvas = document.getElementById('canvaz');
+var ctx = canvas.getContext('2d');
 var context;
 var playing = false;
 var playTime = 0;
-var canvas = document.getElementById('canvaz');
-var ctx = canvas.getContext('2d');
-var slop = .02
+var slop = .01;
 
 //SETUP LOAD ALL THE AUDIO
+window.onload = init;
 function init() {
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
-	//bufferTracks();
-	loadKek("/data/song.kek", "url")
+	loadKek("/data/song1.kek", "url")
 }
 
 
-
+// Loop for Draw and scheduling
 function mainLoop(){
 	setInterval(function(){
 		draw()
@@ -42,9 +36,10 @@ function draw(){
 	canvas.width = songData.end * zoom
 	canvas.height = songData.tracks.length * 62
 	for (var i=0; i<songData.tracks.length; ++i) {
-		for (var af=0; af<songData.tracks[i].audio.length; ++af){
-			var timeTotal = songData.tracks[i].audio[af].init_formal
-			var tlen = globalTime("time", bufferData.buffers[songData.tracks[i].audio[af].file].duration, "formal")
+		var rev = songData.tracks[i].currentRevision
+		for (var af=0; af<songData.tracks[i].revisions[rev].audio.length; ++af){
+			var timeTotal = songData.tracks[i].revisions[rev].audio[af].init_formal
+			var tlen = globalTime("time", bufferData.buffers[songData.tracks[i].revisions[rev].audio[af].file].duration, "formal")
 			var my_gradient = ctx.createLinearGradient(0, 0, 0, 170);
 			my_gradient.addColorStop(0, "#2ff3f3");
 			my_gradient.addColorStop(1, "#b400e1");
@@ -57,3 +52,10 @@ function draw(){
 		}
 	}
 }
+
+
+socket.on('data', function(newdata) {
+	data = newdata;
+	document.getElementById('chatText').innerHTML=chatData
+	document.getElementById('usrmsg').value = "";
+});

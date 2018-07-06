@@ -2,7 +2,8 @@
 function playSound(track, audioFile, time, offset) {
   console.log(track, audioFile, time, offset)
 	bufferData.tracks[track].sources[audioFile] = context.createBufferSource();
-	bufferData.tracks[track].sources[audioFile].buffer = bufferData.buffers[songData.tracks[track].audio[audioFile].file]
+  var rev = songData.tracks[track].currentRevision
+	bufferData.tracks[track].sources[audioFile].buffer = bufferData.buffers[songData.tracks[track].revisions[rev].audio[audioFile].file]
 	bufferData.tracks[track].sources[audioFile].connect(bufferData.tracks[track].sources[audioFile].context.destination)
 	bufferData.tracks[track].sources[audioFile].start(time + slop, offset)
 	console.log("PlayFunction:", time + slop, offset)
