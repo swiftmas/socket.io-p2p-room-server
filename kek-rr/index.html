@@ -17,7 +17,6 @@
 
 
 <div class="left" id="muzak">
-  <div>
     <table class="left" id="mixer">
         <tbody>
         <tr>
@@ -30,19 +29,18 @@
         </tr>
         </tbody>
     </table>
-  </div>
-  <div class="canvas-container">
-    <canvas class="center" id="canvaz"></canvas>
-  </div>
+    <div style="width: 100%; overflow: hidden;">
+        <div id="trackHeaders" class="track-header-container">
+        </div>
+        <div class="canvas-container">
+            <canvas class="center" id="canvaz"></canvas>
+        </div>
+    </div>
 
   <hr>
 </div>
 
-
 <div id="chatNStuff">
-
-
-
   <section id="chatbox" class="module">
 
     <header class="top-bar" onclick="if(document.getElementById('chatbox').bottom == 0){document.getElementById('chatbox').bottom = -450px} else {document.getElementById('chatbox').bottom = 0px}">
@@ -73,8 +71,6 @@
       <button onclick="socket.emit('addtochat', document.getElementById('usrmsg').value)">send</button>
     </ol>
   </section>
-
-
 </div>
 
 </body>

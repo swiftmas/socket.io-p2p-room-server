@@ -3,29 +3,29 @@ function loadKek(file, type){
   if (type == "url"){
     var request = new XMLHttpRequest();
     console.log("Retreiving Kek file: " + file)
-    console.log("Memory Pressure: "+ (window.performance.memory.usedJSHeapSize/window.performance.memory.jsHeapSizeLimit) + "%")
     request.open("GET", file, true);
     request.responseType = "arraybuffer";
     request.onload = function() {
-        //Promise1 -----------------
+        //Promise1 - Load Zipfile-----------------
         var zip = JSZip.loadAsync(request.response)
         zip.then(function(value) {
-          //Promise2.0 ---------------
+          //Promise2.0 - Load Context from zip file and ipmort to global context---------------
+          console.log("Reading Song Data")
           var contextFile = value.file("context.json").async("string");
           contextFile.then(function(value){
             //write songdata json to global var
-            console.log("Reading Song Data")
-            console.log("Memory Pressure: "+ (window.performance.memory.usedJSHeapSize/window.performance.memory.jsHeapSizeLimit) + "%")
             songData = JSON.parse(value);
+            console.log("Song Data Gathered")
           });
-          //Promise2.1 ----------------
+          //Promise2.1 - Begin unpacking the audio files ----------------
           kekFileData["totalFiles"] = Object.keys(value.files).length
           console.log("Unpacking Files")
           for (var fileName in value.files){
             if (fileName != "context.json"){
               kekFileData[fileName] = {}
               kekFileData[fileName].promise = value.file(fileName).async("blob");
-              kekFileData[fileName].promise.then(assignFileDataBlob.bind(value, fileName))
+              //Promise3 - write files to blob format and send them to the buffer initiator function below.
+              kekFileData[fileName].promise.then(assignFileDataBlob.bind(value, fileName)) // the bind is out of order . . . but it works so whatever.
             }
           }
         });
@@ -36,15 +36,15 @@ function loadKek(file, type){
     request.send();
   };
 }
-//
+//Last step of the promises. Assigns the kekFileData value to the blob and passes things onto create buffers
 function assignFileDataBlob(fileName, value) {
   kekFileData[fileName].value = value
   console.log(kekFileData);
-  console.log("Memory Pressure: "+ (window.performance.memory.usedJSHeapSize/window.performance.memory.jsHeapSizeLimit) + "%")
   kekFileData["promiseCount"] += 1
+  createBuffer(fileName);
   if (kekFileData["promiseCount"] == kekFileData["totalFiles"] - 1){
-    console.log("BeginBufferTracks");
-    bufferTracks();
+    console.log("Buffering Finished");
+    finishedLoading();
   }
 }
 /////////////////////////////////////////////////////////////
@@ -59,7 +59,6 @@ function createBuffer(fileName) {
     context.decodeAudioData(originArrayBuffer[fileName]).then(function (audioBuffer) {
       bufferData.buffers[fileName] = audioBuffer;
       console.log("Buffer Created for: "+ fileName + " at: originArrayBuffer."+fileName)
-      console.log("Memory Pressure: "+ (window.performance.memory.usedJSHeapSize/window.performance.memory.jsHeapSizeLimit) + "%")
     })
   }
   fileReader.readAsArrayBuffer(kekFileData[fileName].value)
@@ -67,37 +66,11 @@ function createBuffer(fileName) {
 
 /////////////////////////////////////////////////////////////
 
-
-
-function bufferTracks(a){
-  //----- This part lets us define an optional param to only reload one of the tracks. ------
-  // So a doesnt have to be passed, we can call just init() unless we want a specific track /
-  a = a || "all";
-  if ( a == "all"){
-  var i = 0;
-    upperBound=songData.tracks.length
-  } else {
-    var i = a;
-    upperBound = a + 1;
-  }
-  //---- --- --  ----------------------------------------------------------------------------
-  for (var i=0; i<songData.tracks.length; ++i) {
-    bufferData.tracks[i]={"sources": []};
-    var rev = songData.tracks[i].currentRevision
-    for (var af=0; af<songData.tracks[i].revisions[rev].audio.length; ++af){
-      var fileName=songData.tracks[i].revisions[rev].audio[af].file
-      if (!originArrayBuffer.hasOwnProperty(fileName)){
-        createBuffer(fileName);
-      };
-    };
-  }
-  finishedLoading();
-}
-
-
 // Sets up some math I dont wanna do right now and starts main loop. NEEDS REMOVED
+// THE ONLY ESSENTIAL PART OF THIS is creating the sources object per bufferData.tracks
 function finishedLoading() {
   for (var track=0; track<songData.tracks.length; ++track) {
+    bufferData.tracks[track]={"sources": []};
     var rev = songData.tracks[track].currentRevision
   	for (var s=0; s<songData.tracks[track].revisions[rev].audio.length; ++s){
   		// This will setup our timers so that we use real time instead of calling the function every time
