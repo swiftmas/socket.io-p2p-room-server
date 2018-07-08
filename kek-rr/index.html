@@ -33,15 +33,16 @@
         <div id="trackHeaders" class="track-header-container">
         </div>
         <div class="canvas-container">
-            <canvas class="center" id="canvaz"></canvas>
+            <canvas class="center" id="canvaz" onmousemove="getMousePosition()" onmousedown="getCell()"></canvas>
         </div>
     </div>
+    <button onclick="newTrack()"class="reset">NewTrack</button>
 
   <hr>
   track<input id="tdn"/>
-    key1<input id="tdn"/>
-    key2<input id="tdn"/>
-   <input class="track-drop" id="track-drop" onchange="newTrack(document.getElementById('tdn').value, this.files[0])" type="file" />
+    Measures<input id="tm0"/>
+    Beats<input id="tm1"/>
+   <input class="track-drop" id="track-drop" onchange="newAudio(document.getElementById('tdn').value, this.files[0],document.getElementById('tm0').value,document.getElementById('tm1').value)" type="file" />
 </div>
 
 <div id="chatNStuff">
@@ -79,8 +80,11 @@
 
 </body>
 <script src="/kek-rr/main.js"></script>
+<script src="/kek-rr/ui.js"></script>
+
 <script src="/kek-rr/buffer-loader.js"></script>
 <script src="/kek-rr/controls.js"></script>
 <script src="/kek-rr/playback.js"></script>
+
 
 </html>
