@@ -31,6 +31,13 @@ function mainLoop(){
 	}, 60/songData.bpm/4);
 }
 
+function newTrack(track, file){
+	createBuffer(file);
+	var rev = songData.tracks[track].currentRevision
+	var newtrack = {"file":file, "init_formal": [0,0,0,0,0]}
+	songData.tracks[track].revision[rev].audio.push(newtrack)
+}
+
 
 function pageDraw(){
   console.log("DrawTracks")
