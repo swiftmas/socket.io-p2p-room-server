@@ -71,12 +71,13 @@ function createBuffer(fileName) {
 function finishedLoading() {
   for (var track=0; track<songData.tracks.length; ++track) {
     bufferData.tracks[track]={"sources": []};
-    var rev = songData.tracks[track].currentRevision
-  	for (var s=0; s<songData.tracks[track].revisions[rev].audio.length; ++s){
-  		// This will setup our timers so that we use real time instead of calling the function every time
-  		songData.tracks[track].revisions[rev].audio[s].init_time = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "time")
-      songData.tracks[track].revisions[rev].audio[s].init_128 = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "128")
-  					mainLoop();
-  	}
+    for (var rev in songData.tracks[track].revisions){
+    	for (var s=0; s<songData.tracks[track].revisions[rev].audio.length; ++s){
+    		// This will setup our timers so that we use real time instead of calling the function every time
+    		songData.tracks[track].revisions[rev].audio[s].init_time = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "time")
+        songData.tracks[track].revisions[rev].audio[s].init_128 = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "128")
+    	}
+    }
   }
+  mainLoop();
 }

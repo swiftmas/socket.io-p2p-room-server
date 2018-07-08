@@ -34,22 +34,34 @@ function mainLoop(){
 
 function pageDraw(){
   console.log("DrawTracks")
-  
-  var trackMarkup = `
-      ${songData.tracks.map((item, i) => `
-      <div class="track-header">
-        ${item.trackName} <br>
-        <select>
-          <option value="rev1">rev1</option>
-          <option value="saab">rev2</option>
-          <option value="audi">New-2</option>
-        </select>
-      </div>
-      `).join('')}
-      `
-  document.getElementById('trackHeaders').innerHTML = trackMarkup
+  let htmlData = ""
+  for (var track=0; track<songData.tracks.length; ++track) {
+    let trackName = songData.tracks[track].trackName
+    let mark1 = `
+        <div class="track-header">
+          ${trackName} <br>
+          <select onchange="changeRev(this, ${track})">
+        `
+    let mark2 = ""
+    for (var revision in songData.tracks[track].revisions){
+      mark2 +=`<option value="${revision}">${revision}</option>`
+    }
+    let mark3 =`
+          </select>
+        </div>
+        `
+    htmlData = htmlData + mark1 + mark2 + mark3
+  }
+  document.getElementById('trackHeaders').innerHTML = htmlData
+
 }
 
+
+function changeRev(revValue, track){
+    stop()
+    var value = revValue.value;
+    songData.tracks[track].currentRevision = value
+}
 
 function draw(){
 	var zoom = 16

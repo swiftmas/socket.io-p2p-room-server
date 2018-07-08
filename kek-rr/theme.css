@@ -67,6 +67,7 @@ canvas {
 
 /*  MESSAGING STUFF */
 .module {
+  display: none;
   width: 300px;
   background-color: #ababab;
   overflow-y: auto;
