@@ -32,10 +32,13 @@ function mainLoop(){
 }
 
 function newTrack(track, file){
-	createBuffer(file);
-	var rev = songData.tracks[track].currentRevision
-	var newtrack = {"file":file, "init_formal": [0,0,0,0,0]}
-	songData.tracks[track].revision[rev].audio.push(newtrack)
+    kekFileData[file.name] = {}
+    kekFileData[file.name].value = file;
+    createBuffer(file.name);
+  	var rev = songData.tracks[track].currentRevision
+  	var newtrack = {"file":file.name, "init_formal": [0,0,0,0,0]}
+  	songData.tracks[track].revisions[rev].audio.push(newtrack)
+    finishedLoading()
 }
 
 
