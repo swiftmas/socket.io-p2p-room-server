@@ -1,7 +1,7 @@
 function getMousePosition() {
  var x = new Number();
  var y = new Number();
-
+ var canvasDiv = document.getElementById("canvas-container")
  if (event.pageX != undefined && event.pageY != undefined) {
     x = event.pageX;
     y = event.pageY;
@@ -13,13 +13,15 @@ function getMousePosition() {
             + document.documentElement.scrollTop;
  }
 
- x -= canvas.offsetLeft;
- y -= canvas.offsetTop;
+ x -= canvasDiv.offsetLeft - canvasDiv.scrollLeft;
+ y -= canvasDiv.offsetTop;
  document.getElementById('xcoord').innerHTML = x;
  document.getElementById('ycoord').innerHTML = y;
 
 return [x,y];
 }
+
+
 
 function pageDraw(){
   console.log("DrawTracks")
@@ -27,8 +29,8 @@ function pageDraw(){
   for (var track=0; track<songData.tracks.length; ++track) {
     let trackName = songData.tracks[track].trackName
     let mark1 = `
-        <div class="track-header">
-          <div contenteditable="true">${trackName}</div>
+        <div class="track-header" onclick="editorData.track=${track}">
+          <div onchange="alert('THIS HAPPENED')" contenteditable="true">${trackName}</div>
           <select onchange="changeRev(this, ${track})">
         `
     let mark2 = ""
@@ -62,10 +64,13 @@ function draw(){
 			var timeTotal = songData.tracks[i].revisions[rev].audio[af].init_formal
 			var tlen = globalTime("time", bufferData.buffers[songData.tracks[i].revisions[rev].audio[af].file].duration, "formal")
 			var my_gradient = ctx.createLinearGradient(0, 0, 0, 170+(100*i));
-			my_gradient.addColorStop(0, "#2ff3f3");
-			my_gradient.addColorStop(1, "#b400e1");
-      //my_gradient.addColorStop(0, "#eee");
-			//my_gradient.addColorStop(1, "#fff");
+      if (songData.tracks[i].revisions[rev].audio[af].selected == true){
+			   my_gradient.addColorStop(0, "#2ff3f3");
+			   my_gradient.addColorStop(1, "#00035f");
+      } else {
+        my_gradient.addColorStop(0, "#2ff3f3");
+        my_gradient.addColorStop(1, "#b400e1");
+      }
 			ctx.fillStyle = my_gradient;
 			ctx.fillRect(timeTotal[0]*uiZoom,i*82,tlen[0]*uiZoom,80);
 			ctx.fillStyle = "Black"
@@ -75,3 +80,7 @@ function draw(){
 		}
 	}
 }
+
+document.getElementById("editor").addEventListener("input", function() {
+    console.log("input event fired");
+}, false);

@@ -25,6 +25,7 @@
           <td><button class="reset" onclick="resume(12)">Play</button></td>
           <td><button class="stop" onclick="stop(2)">Pause</button></td>
           <td><button class="start" onclick="seek([document.getElementById('seekInput').value,0,0,0,0])">Seek to</button><input id="seekInput"></td>
+          <td>debug:  x=<span id="xcoord"></span> y=<span id="ycoord"></span></td>
 
         </tr>
         </tbody>
@@ -32,17 +33,17 @@
     <div style="width: 100%; overflow: hidden;">
         <div id="trackHeaders" class="track-header-container">
         </div>
-        <div class="canvas-container">
-            <canvas class="center" id="canvaz" onmousemove="getMousePosition()" onmousedown="getCell()"></canvas>
+        <div class="canvas-container" id="canvas-container">
+            <canvas class="center" id="canvaz" onmousemove="getMousePosition()" onmousedown="select()"></canvas>
         </div>
     </div>
     <button onclick="newTrack()"class="reset">NewTrack</button>
 
   <hr>
-  track<input id="tdn"/>
-    Measures<input id="tm0"/>
-    Beats<input id="tm1"/>
-   <input class="track-drop" id="track-drop" onchange="newAudio(document.getElementById('tdn').value, this.files[0],document.getElementById('tm0').value,document.getElementById('tm1').value)" type="file" />
+  track<input value="0" id="tdn"/>
+    Measures<input value="0" id="tm0"/>
+    Beats<input value="0" id="tm1"/>
+   <input class="track-drop" id="track-drop" onchange="newAudio(document.getElementById('tdn').value, this.files[0],parseInt(document.getElementById('tm0').value),parseInt(document.getElementById('tm1').value))" type="file" />
 </div>
 
 <div id="chatNStuff">

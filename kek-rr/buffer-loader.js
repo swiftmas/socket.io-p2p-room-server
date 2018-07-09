@@ -44,7 +44,6 @@ function assignFileDataBlob(fileName, value) {
   createBuffer(fileName);
   if (kekFileData["promiseCount"] == kekFileData["totalFiles"] - 1){
     console.log("Buffering Finished");
-    finishedLoading();
   }
 }
 /////////////////////////////////////////////////////////////
@@ -59,6 +58,7 @@ function createBuffer(fileName) {
     context.decodeAudioData(originArrayBuffer[fileName]).then(function (audioBuffer) {
       bufferData.buffers[fileName] = audioBuffer;
       console.log("Buffer Created for: "+ fileName + " at: originArrayBuffer."+fileName)
+      reMathTiming();
     })
   }
   fileReader.readAsArrayBuffer(kekFileData[fileName].value)
@@ -68,7 +68,7 @@ function createBuffer(fileName) {
 
 // Sets up some math I dont wanna do right now and starts main loop. NEEDS REMOVED
 // THE ONLY ESSENTIAL PART OF THIS is creating the sources object per bufferData.tracks
-function finishedLoading() {
+function reMathTiming() {
   for (var track=0; track<songData.tracks.length; ++track) {
     bufferData.tracks[track]={"sources": []};
     for (var rev in songData.tracks[track].revisions){
@@ -76,6 +76,10 @@ function finishedLoading() {
     		// This will setup our timers so that we use real time instead of calling the function every time
     		songData.tracks[track].revisions[rev].audio[s].init_time = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "time")
         songData.tracks[track].revisions[rev].audio[s].init_128 = globalTime("formal", songData.tracks[track].revisions[rev].audio[s].init_formal, "128")
+        songData.tracks[track].revisions[rev].audio[s].end_formal = globalTime("time", songData.tracks[track].revisions[rev].audio[s].init_time + bufferData.buffers[songData.tracks[track].revisions[rev].audio[s].file].duration, "formal")
+        if (songData.end < songData.tracks[track].revisions[rev].audio[s].end_formal[0]){
+          songData.end = songData.tracks[track].revisions[rev].audio[s].end_formal[0] +20
+        }
     	}
     }
   }
