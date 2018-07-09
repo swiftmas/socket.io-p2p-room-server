@@ -1,7 +1,7 @@
 {
   "tracks": [
     {
-      "trackName": "Synth",
+      "trackName": "Track1",
       "currentRevision": "Master",
       "revisions": {
         "Master": {
@@ -19,7 +19,8 @@
       }
     }
   ],
-  "songName": "Song1",
+  "songName": "NewSong",
   "bpm": 140,
-  "end": 177
+  "end": 20,
+  "uiZoom": 64
 }
