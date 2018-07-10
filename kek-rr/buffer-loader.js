@@ -16,6 +16,7 @@ function loadKek(file, type){
             //write songdata json to global var
             songData = JSON.parse(value);
             console.log("Song Data Gathered")
+            mainLoop(); //// THIS IS KIND OF HIDING, Starting the main draw loop here once audio positions are procured.
           });
           //Promise2.1 - Begin unpacking the audio files ----------------
           kekFileData["totalFiles"] = Object.keys(value.files).length
@@ -70,7 +71,9 @@ function createBuffer(fileName) {
 // THE ONLY ESSENTIAL PART OF THIS is creating the sources object per bufferData.tracks
 function reMathTiming() {
   for (var track=0; track<songData.tracks.length; ++track) {
-    bufferData.tracks[track]={"sources": []};
+    if (bufferData.tracks.length == track){
+      bufferData.tracks[track]={"sources": []};
+    }
     for (var rev in songData.tracks[track].revisions){
     	for (var s=0; s<songData.tracks[track].revisions[rev].audio.length; ++s){
     		// This will setup our timers so that we use real time instead of calling the function every time
@@ -83,5 +86,4 @@ function reMathTiming() {
     	}
     }
   }
-  mainLoop();
 }

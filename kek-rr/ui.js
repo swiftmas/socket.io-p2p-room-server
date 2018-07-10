@@ -15,6 +15,7 @@ function getMousePosition() {
 
  x -= canvasDiv.offsetLeft - canvasDiv.scrollLeft;
  y -= canvasDiv.offsetTop;
+ y = parseInt(y/82)
  document.getElementById('xcoord').innerHTML = x;
  document.getElementById('ycoord').innerHTML = y;
 
@@ -28,17 +29,22 @@ function pageDraw(){
   let htmlData = ""
   for (var track=0; track<songData.tracks.length; ++track) {
     let trackName = songData.tracks[track].trackName
+    let trackClass = "track-header"
+    if (editorData.track == track){trackClass = "track-header-selected"}
     let mark1 = `
-        <div class="track-header" onclick="editorData.track=${track}">
+        <div class="${trackClass}" id="track-header-${track}">
           <div onchange="alert('THIS HAPPENED')" contenteditable="true">${trackName}</div>
           <select onchange="changeRev(this, ${track})">
         `
     let mark2 = ""
     for (var revision in songData.tracks[track].revisions){
-      mark2 +=`<option value="${revision}">${revision}</option>`
+      let selector = ""
+      if (revision == songData.tracks[track].currentRevision){ selector = "selected"}
+      mark2 +=`<option value="${revision}" ${selector}>${revision}</option>`
     }
     let mark3 =`
           </select>
+          <button onclick="trackRaise(${track})">Raise</button>
         </div>
         `
     htmlData = htmlData + mark1 + mark2 + mark3
@@ -49,6 +55,7 @@ function pageDraw(){
 
 
 function changeRev(revValue, track){
+    start()
     stop()
     var value = revValue.value;
     songData.tracks[track].currentRevision = value
@@ -67,6 +74,9 @@ function draw(){
       if (songData.tracks[i].revisions[rev].audio[af].selected == true){
 			   my_gradient.addColorStop(0, "#2ff3f3");
 			   my_gradient.addColorStop(1, "#00035f");
+      } else if (editorData.track != "none" && editorData.track != i) {
+        my_gradient.addColorStop(0, "#c3c3c3");
+        my_gradient.addColorStop(1, "#474647");
       } else {
         my_gradient.addColorStop(0, "#2ff3f3");
         my_gradient.addColorStop(1, "#b400e1");
@@ -80,7 +90,3 @@ function draw(){
 		}
 	}
 }
-
-document.getElementById("editor").addEventListener("input", function() {
-    console.log("input event fired");
-}, false);

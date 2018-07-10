@@ -40,10 +40,16 @@
     <button onclick="newTrack()"class="reset">NewTrack</button>
 
   <hr>
-  track<input value="0" id="tdn"/>
+  <div id="revisionContext" style="display: none;">
+    <button onclick="cancelRevision()"class="stop">Cancel Revision</button>
+    <br>
+    <div id="afModify"></div>
+    <br>
+    <b>Add Audio File: </b>
     Measures<input value="0" id="tm0"/>
     Beats<input value="0" id="tm1"/>
-   <input class="track-drop" id="track-drop" onchange="newAudio(document.getElementById('tdn').value, this.files[0],parseInt(document.getElementById('tm0').value),parseInt(document.getElementById('tm1').value))" type="file" />
+   <input class="track-drop" id="track-drop" onchange="newAudio(this.files[0],parseInt(document.getElementById('tm0').value),parseInt(document.getElementById('tm1').value))" type="file" />
+  </div>
 </div>
 
 <div id="chatNStuff">

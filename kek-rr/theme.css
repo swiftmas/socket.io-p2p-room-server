@@ -61,18 +61,19 @@ canvas {
     height: 72px;
     padding: 4px;
     margin-bottom: 2px;
-    background-color: #eee;
+    background-color: #c3c3c3;
     white-space: nowrap;
 }
 
 .track-header-selected {
-    width: 100%;
-    height: 72px;
-    padding: 4px;
-    margin-bottom: 2px;
-    background-color: #ccc;
-    white-space: nowrap;
+  width: 100%;
+  height: 72px;
+  padding: 4px;
+  margin-bottom: 2px;
+  background-color: #eee;
+  white-space: nowrap;
 }
+
 
 /*  MESSAGING STUFF */
 .module {

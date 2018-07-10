@@ -4,7 +4,7 @@ var songData = {};
 var bufferData = {"analysers": [], "tracks": [], "buffers":{}};
 var originArrayBuffer = {};
 var kekFileData = {"promiseCount":0, "totalFiles": 1000};
-var editorData = {track: false, "selected":[], "revision": ""}
+var editorData = {track: "none", "selected":[], "revision": ""}
 var chatData = "";
 
 var socket = io.connect();
@@ -14,7 +14,6 @@ var context;
 var playing = false;
 var playTime = 0;
 var slop = .01;
-var editorData = {track: false, "selected":[], "revision": ""}
 
 //SETUP LOAD ALL THE AUDIO
 window.onload = init;
@@ -33,11 +32,12 @@ function mainLoop(){
 	}, 60/songData.bpm/4);
 }
 
-function newAudio(track, file, measure, beat){
+function newAudio(file, measure, beat){
     kekFileData[file.name] = {}
     kekFileData[file.name].value = file;
     createBuffer(file.name);
-  	var rev = songData.tracks[track].currentRevision
+  	var rev = editorData.revision
+    var track = editorData.track
   	var newtrack = {"file":file.name, "init_formal": [measure,beat,0,0,0]}
   	songData.tracks[track].revisions[rev].audio.push(newtrack)
     reMathTiming()
@@ -48,22 +48,71 @@ function newTrack(){
   songData.tracks.push(newtrack);
   pageDraw();
 }
+// Selects a track and creates a new audio context off of master.
+function trackRaise(track){
+  if (editorData.track == "none"){
+    editorData.track = track
+    var rev = songData.tracks[track].currentRevision
+    let branchName="branch"+Object.keys(songData.tracks[track].revisions).length
+    songData.tracks[track].revisions[branchName]= JSON.parse(JSON.stringify(songData.tracks[track].revisions[rev]))
+    songData.tracks[track].currentRevision = branchName
+    editorData.revision = branchName
+    document.getElementById("revisionContext").style.display = "block"
+    pageDraw()
+  }
+}
+
+function deleteAudio(af){
+  start()
+  stop()
+  var rev = editorData.revision
+  var track = editorData.track
+  console.log("removing "+songData.tracks[track].revisions[rev].audio[af].file )
+  songData.tracks[track].revisions[rev].audio.splice(af, 1)
+}
+
+function cancelRevision(){
+  start()
+  stop()
+  var rev = editorData.revision
+  var track = editorData.track
+  songData.tracks[track].currentRevision = "Master"
+
+  delete songData.tracks[track].revisions[rev]
+  editorData.revision = ""
+  editorData.track = "none"
+  document.getElementById("revisionContext").style.display = "none"
+  pageDraw();
+
+}
 
 function select(){
   let xy = getMousePosition();
   let measure = xy[0]/songData.uiZoom;
-  for (var i=0; i<songData.tracks.length; ++i) {
-		var rev = songData.tracks[i].currentRevision
-		for (var af=0; af<songData.tracks[i].revisions[rev].audio.length; ++af){
-      audioFile = songData.tracks[i].revisions[rev].audio[af]
-      console.log(measure, audioFile.init_formal[0], audioFile.end_formal[0] )
-      if (audioFile.end_formal[0] > measure && audioFile.init_formal[0] < measure && i == editorData.track){
-        audioFile["selected"] = true
-      } else {
-        audioFile["selected"] = false
-      }
+  if (editorData.track == "none"){
+    return;
+  } else {
+    i = editorData.track // Currently Selected Track
+  }
+	var rev = songData.tracks[i].currentRevision
+  var AF = 0
+  if (rev !== editorData.revision ){alert("You cannot manipulate audio outside of the opened revision. Re-open "+ editorData.revision+" to continue editing or cancel the revision to return to select tracks."); return}
+	for (var af=0; af<songData.tracks[i].revisions[rev].audio.length; ++af){
+    audioFile = songData.tracks[i].revisions[rev].audio[af]
+    console.log(measure, audioFile.init_formal[0], audioFile.end_formal[0] )
+    if (audioFile.end_formal[0] > measure && audioFile.init_formal[0] < measure && xy[1] == i){
+      AF = af
+      audioFile["selected"] = true
+    } else {
+      audioFile["selected"] = false
     }
   }
+  let html =`
+  Measures<input value="${audioFile.init_formal[0]}" id="tm0"/>
+  Beats<input value="${audioFile.init_formal[1]}" id="tm1"/>
+  <button onclick="deleteAudio(${AF})">Delete Audio Segment</button>
+  `
+  document.getElementById("afModify").innerHTML= html
 
 }
 
