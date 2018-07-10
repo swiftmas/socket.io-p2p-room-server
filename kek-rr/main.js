@@ -49,8 +49,8 @@ function newTrack(){
   pageDraw();
 }
 
-function select(){
-  let xy = getMousePosition();
+function select(event){
+  let xy = getMousePosition(event);
   let measure = xy[0]/songData.uiZoom;
   for (var i=0; i<songData.tracks.length; ++i) {
 		var rev = songData.tracks[i].currentRevision

@@ -1,4 +1,4 @@
-function getMousePosition() {
+function getMousePosition(event) {
  var x = new Number();
  var y = new Number();
  var canvasDiv = document.getElementById("canvas-container")

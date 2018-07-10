@@ -34,7 +34,7 @@
         <div id="trackHeaders" class="track-header-container">
         </div>
         <div class="canvas-container" id="canvas-container">
-            <canvas class="center" id="canvaz" onmousemove="getMousePosition()" onmousedown="select()"></canvas>
+            <canvas class="center" id="canvaz" onmousemove="getMousePosition(event)" onmousedown="select(event)"></canvas>
         </div>
     </div>
     <button onclick="newTrack()"class="reset">NewTrack</button>
