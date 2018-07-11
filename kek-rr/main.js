@@ -18,9 +18,13 @@ var slop = .01;
 //SETUP LOAD ALL THE AUDIO
 window.onload = init;
 function init() {
+  var roomName = window.location.pathname.substring(6)
+  var songName = window.location.hash.substring(1)
+  socket.emit('create-room', roomName);
+  socket.emit('join-room', roomName);
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
-	loadKek("/data/newSong.kek", "url")
+	loadKek("/data/"+ songName, "url")
 }
 
 
@@ -41,6 +45,8 @@ function newAudio(file, measure, beat){
   	var newtrack = {"file":file.name, "init_formal": [measure,beat,0,0,0]}
   	songData.tracks[track].revisions[rev].audio.push(newtrack)
     reMathTiming()
+    start()
+    stop()
 }
 
 function newTrack(){
@@ -62,8 +68,21 @@ function trackRaise(track){
   }
 }
 
+function trackEdit(track){
+  if (editorData.track == "none"){
+    if (songData.tracks[track].currentRevision == "Master"){
+      alert("You cannot edit Master, master must be commited to.")
+      return
+    }
+    editorData.track = track
+    editorData.revision = songData.tracks[track].currentRevision
+    document.getElementById("revisionContext").style.display = "block"
+    pageDraw()
+  }
+}
+
+
 function deleteAudio(af){
-  start()
   stop()
   var rev = editorData.revision
   var track = editorData.track
@@ -72,12 +91,10 @@ function deleteAudio(af){
 }
 
 function cancelRevision(){
-  start()
   stop()
   var rev = editorData.revision
   var track = editorData.track
   songData.tracks[track].currentRevision = "Master"
-
   delete songData.tracks[track].revisions[rev]
   editorData.revision = ""
   editorData.track = "none"
@@ -86,8 +103,21 @@ function cancelRevision(){
 
 }
 
-function select(){
-  let xy = getMousePosition();
+
+function saveRevision(){
+  stop()
+  var rev = editorData.revision
+  var track = editorData.track
+  //delete songData.tracks[track].revisions[rev]
+  editorData.revision = ""
+  editorData.track = "none"
+  document.getElementById("revisionContext").style.display = "none"
+  pageDraw();
+
+}
+
+function select(event){
+  let xy = getMousePosition(event);
   let measure = xy[0]/songData.uiZoom;
   if (editorData.track == "none"){
     return;

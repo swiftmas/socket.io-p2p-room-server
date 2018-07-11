@@ -7,9 +7,9 @@
   <meta name="description" content="jscripttest">
   <meta name="author"   content="SitePoint">
   <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-  <link rel="stylesheet" type="text/css" href="normalize.css">
-  <link rel="stylesheet" type="text/css" href="skeleton.css">
-  <link rel="stylesheet" type="text/css" href="theme.css">
+  <link rel="stylesheet" type="text/css" href="/kek-rr/normalize.css">
+  <link rel="stylesheet" type="text/css" href="/kek-rr/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="/kek-rr/theme.css">
   <script src="/socket.io/socket.io.js"></script>
   <script src="/kek-rr/jszip.min.js"></script>
 </head>
@@ -23,7 +23,7 @@
           <td><button id=currentTime></button></td>
           <td><button class="start" onclick="start(1)">start</button></td>
           <td><button class="reset" onclick="resume(12)">Play</button></td>
-          <td><button class="stop" onclick="stop(2)">Pause</button></td>
+          <td><button class="stop" onclick="pause(2)">Pause</button></td>
           <td><button class="start" onclick="seek([document.getElementById('seekInput').value,0,0,0,0])">Seek to</button><input id="seekInput"></td>
           <td>debug:  x=<span id="xcoord"></span> y=<span id="ycoord"></span></td>
 
@@ -34,7 +34,7 @@
         <div id="trackHeaders" class="track-header-container">
         </div>
         <div class="canvas-container" id="canvas-container">
-            <canvas class="center" id="canvaz" onmousemove="getMousePosition()" onmousedown="select()"></canvas>
+            <canvas class="center" id="canvaz" onmousemove="getMousePosition(event)" onmousedown="select(event)"></canvas>
         </div>
     </div>
     <button onclick="newTrack()"class="reset">NewTrack</button>
@@ -42,6 +42,7 @@
   <hr>
   <div id="revisionContext" style="display: none;">
     <button onclick="cancelRevision()"class="stop">Cancel Revision</button>
+    <button onclick="saveRevision()"class="start">Save Revision</button>
     <br>
     <div id="afModify"></div>
     <br>

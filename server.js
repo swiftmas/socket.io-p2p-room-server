@@ -8,11 +8,23 @@ var fs = require('fs');
 var server = http.createServer(function(request, response){
     var path = url.parse(request.url).pathname;
     // host it ///////////////////
-    if (path.substring(0,1 ) == "/" ) {
+    if (path.substring(0,5 ) == "/room" ){
+      fs.readFile(__dirname + "/kek-rr/index.html", function(error, data){
+        if (error){
+          response.writeHead(404);
+          response.write("o0ps this doesn't exist - 404");
+          response.end();
+        }else{
+          response.writeHead(200, {'Content-Type': 'text/html'});
+          response.write(data, "utf8");
+          response.end();
+        }
+      });
+    } else if (path.substring(0,1 ) == "/" ) {
         fs.readFile(__dirname + path, function(error, data){
             if (error){
-                response.writeHead(404);
-                response.write("o0ps this doesn't exist - 404");
+                response.writeHead(404, {'Content-Type': 'text/html'});
+                response.write('<div style="margin: 400px auto; height: 400px; width: 600px; background-color: #f3f3f3;">Whoops, you were not forwarded to a room correctly. Try the following link <br><a href="/room/room1#newSong.kek" style="size: 54px;">!404! </a></div>');
                 response.end();
             }
             else{

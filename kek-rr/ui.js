@@ -1,4 +1,4 @@
-function getMousePosition() {
+function getMousePosition(event) {
  var x = new Number();
  var y = new Number();
  var canvasDiv = document.getElementById("canvas-container")
@@ -39,11 +39,13 @@ function pageDraw(){
     let mark2 = ""
     for (var revision in songData.tracks[track].revisions){
       let selector = ""
-      if (revision == songData.tracks[track].currentRevision){ selector = "selected"}
-      mark2 +=`<option value="${revision}" ${selector}>${revision}</option>`
+      let indicator = ""
+      if (revision == songData.tracks[track].currentRevision){ selector = "selected"; indicator="-"}
+      mark2 +=`<option value="${revision}" ${selector}>${indicator}${revision}${indicator}</option>`
     }
     let mark3 =`
           </select>
+          <button onclick="trackEdit(${track})">E</button>
           <button onclick="trackRaise(${track})">Raise</button>
         </div>
         `
