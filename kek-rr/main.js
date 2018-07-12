@@ -4,10 +4,12 @@ var songData = {};
 var bufferData = {"analysers": [], "tracks": [], "buffers":{}};
 var originArrayBuffer = {};
 var kekFileData = {"promiseCount":0, "totalFiles": 1000};
-var editorData = {track: "none", "selected":[], "revision": ""}
+var editorData = {track: "none", "selected":[], "revision": "", "locked": []}
 var chatData = "";
 
 var socket = io.connect();
+var userSocket;
+var opts = {peerOpts: {trickle: false}, autoUpgrade: false}
 var canvas = document.getElementById('canvaz');
 var ctx = canvas.getContext('2d');
 var context;
@@ -22,6 +24,7 @@ function init() {
   var songName = window.location.hash.substring(1)
   socket.emit('create-room', roomName);
   socket.emit('join-room', roomName);
+  window.userSocket = socket.io.engine.id;
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
 	loadKek("/data/"+ songName, "url")
@@ -57,6 +60,7 @@ function newTrack(){
 // Selects a track and creates a new audio context off of master.
 function trackRaise(track){
   if (editorData.track == "none"){
+    socket.emit('lock', track, userSocket);
     editorData.track = track
     var rev = songData.tracks[track].currentRevision
     let branchName="branch"+Object.keys(songData.tracks[track].revisions).length
@@ -70,6 +74,7 @@ function trackRaise(track){
 
 function trackEdit(track){
   if (editorData.track == "none"){
+    socket.emit('lock', track, userSocket);
     if (songData.tracks[track].currentRevision == "Master"){
       alert("You cannot edit Master, master must be commited to.")
       return
@@ -77,6 +82,7 @@ function trackEdit(track){
     editorData.track = track
     editorData.revision = songData.tracks[track].currentRevision
     document.getElementById("revisionContext").style.display = "block"
+    document.getElementById("cancelRevision").style.display = "hidden"
     pageDraw()
   }
 }
@@ -92,6 +98,7 @@ function deleteAudio(af){
 
 function cancelRevision(){
   stop()
+  socket.emit('unlock', track, userSocket);
   var rev = editorData.revision
   var track = editorData.track
   songData.tracks[track].currentRevision = "Master"
@@ -108,10 +115,19 @@ function saveRevision(){
   stop()
   var rev = editorData.revision
   var track = editorData.track
+  socket.emit('unlock', track, userSocket);
+  var trackBranchData = songData.tracks[track].revisions[rev]
+  var buffersToSend=[];
+  for (var af=0; af<songData.tracks[track].revisions[rev].audio.length; ++af){
+    fileName = songData.tracks[track].revisions[rev].audio[af].file
+    buffersToSend.push({ fileName: bufferData.buffers[fileName]})
+  }
+  socket.emit('pushTracks', track, userSocket, rev, trackBranchData, buffersToSend );
   //delete songData.tracks[track].revisions[rev]
   editorData.revision = ""
   editorData.track = "none"
   document.getElementById("revisionContext").style.display = "none"
+  document.getElementById("cancelRevision").style.display = "show"
   pageDraw();
 
 }

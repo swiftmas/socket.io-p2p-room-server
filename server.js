@@ -57,6 +57,11 @@ var io = require("socket.io")(server);
 var p2pserver = require("socket.io-p2p-server").Server;
 var CoreLogger = require("core-logger");
 
+function epoch(){
+var milliseconds = (new Date).getTime();
+  return milliseconds
+}
+
 // log to console
 var logger = new CoreLogger({
   label: "socket.io-p2p-room-server"
@@ -67,15 +72,33 @@ var data = "";
 server.listen(3030);
 
 io.on("connection", function(socket){
+
   socket.on("create-room", function(roomId) {
     socket.join(roomId);
     logger.info("created Room", {roomId: roomId});
   });
+
+
   socket.on("addtochat", function(newdat) {
     data =  data + newdat + "<br>"
     io.in('room1').emit("data", data);
     logger.info("newchatdata: ", newdat)
   });
+
+
+  socket.on("lock", function(track, userSocket) {
+    logger.info("lock: ", track, " by: ", userSocket)
+  });
+
+  socket.on("unlock", function(track, userSocket) {
+    logger.info("unlock: ", track, " by: ", userSocket)
+  });
+
+  socket.on("pushTracks", function(track, userSocket, rev, trackBranchData, buffersToSend) {
+    logger.info("PushedTrackData: ", track, userSocket, rev, trackBranchData, buffersToSend)
+    console.log(buffersToSend)
+  });
+
   socket.on("join-room", function(roomId){
     logger.info("Attempting to join room", {userId: socket.id, roomId: roomId});
     if (roomId in io.sockets.adapter.rooms) {
@@ -101,4 +124,5 @@ io.on("connection", function(socket){
   socket.on('disconnect', function () {
     logger.info("Discon")
   });
+
 });
