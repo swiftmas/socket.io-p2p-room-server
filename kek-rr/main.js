@@ -9,6 +9,7 @@ var chatData = "";
 
 var socket = io.connect();
 var userSocket;
+var roomId;
 var opts = {peerOpts: {trickle: false}, autoUpgrade: false}
 var canvas = document.getElementById('canvaz');
 var ctx = canvas.getContext('2d');
@@ -20,10 +21,10 @@ var slop = .01;
 //SETUP LOAD ALL THE AUDIO
 window.onload = init;
 function init() {
-  var roomName = window.location.pathname.substring(6)
+  roomId = window.location.pathname.substring(6)
   var songName = window.location.hash.substring(1)
-  socket.emit('create-room', roomName);
-  socket.emit('join-room', roomName);
+  socket.emit('create-room', roomId);
+  socket.emit('join-room', roomId);
   window.userSocket = socket.io.engine.id;
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
@@ -59,8 +60,8 @@ function newTrack(){
 }
 // Selects a track and creates a new audio context off of master.
 function trackRaise(track){
-  if (editorData.track == "none"){
-    socket.emit('lock', track, userSocket);
+  if (editorData.track == "none" && editorData.locked.indexOf(track) == -1){
+    socket.emit('lock', roomId, userSocket, track);
     editorData.track = track
     var rev = songData.tracks[track].currentRevision
     let branchName="branch"+Object.keys(songData.tracks[track].revisions).length
@@ -73,8 +74,8 @@ function trackRaise(track){
 }
 
 function trackEdit(track){
-  if (editorData.track == "none"){
-    socket.emit('lock', track, userSocket);
+  if (editorData.track == "none" && editorData.locked.indexOf(track) == -1){
+    socket.emit('lock', roomId, userSocket, track);
     if (songData.tracks[track].currentRevision == "Master"){
       alert("You cannot edit Master, master must be commited to.")
       return
@@ -98,7 +99,7 @@ function deleteAudio(af){
 
 function cancelRevision(){
   stop()
-  socket.emit('unlock', track, userSocket);
+  socket.emit('unlock', roomId, userSocket, track);
   var rev = editorData.revision
   var track = editorData.track
   songData.tracks[track].currentRevision = "Master"
@@ -115,14 +116,14 @@ function saveRevision(){
   stop()
   var rev = editorData.revision
   var track = editorData.track
-  socket.emit('unlock', track, userSocket);
+  socket.emit('unlock', roomId, userSocket, track);
   var trackBranchData = songData.tracks[track].revisions[rev]
-  var buffersToSend=[];
+  var filesToSend={};
   for (var af=0; af<songData.tracks[track].revisions[rev].audio.length; ++af){
     fileName = songData.tracks[track].revisions[rev].audio[af].file
-    buffersToSend.push({ fileName: bufferData.buffers[fileName]})
+    filesToSend[fileName] = kekFileData[fileName]
   }
-  socket.emit('pushTracks', track, userSocket, rev, trackBranchData, buffersToSend );
+  socket.emit('pushTracks', roomId, userSocket, track, rev, trackBranchData, filesToSend );
   //delete songData.tracks[track].revisions[rev]
   editorData.revision = ""
   editorData.track = "none"
@@ -167,4 +168,26 @@ socket.on('data', function(newdata) {
 	data = newdata;
 	document.getElementById('chatText').innerHTML=chatData
 	document.getElementById('usrmsg').value = "";
+});
+
+
+socket.on("lock", function(track) {
+  console.log('locking: ', track)
+  editorData.locked.push(track);
+  pageDraw();
+});
+socket.on("unlock", function(track) {
+  console.log('unlocking: ', track)
+  var thatIndex = editorData.locked.indexOf(track);
+  editorData.locked.splice(thatIndex, 1)
+  pageDraw();
+});
+socket.on("newBranch", function(track, rev, trackBranchData, files){
+  songData.tracks[track].revisions[rev] = trackBranchData;
+  for (file in files){
+    console.log(file,files, "_______", trackBranchData)
+    originArrayBuffer[file] = files[file].value
+    createAudioBufferFromArrayBuffer(file)
+  }
+  pageDraw();
 });

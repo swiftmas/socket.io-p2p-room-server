@@ -86,17 +86,35 @@ io.on("connection", function(socket){
   });
 
 
-  socket.on("lock", function(track, userSocket) {
+  socket.on("lock", function(roomName, userSocket, track) {
     logger.info("lock: ", track, " by: ", userSocket)
+    var clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets);
+    clients.forEach(function(client) {
+      if (client !== userSocket){
+        socket.to(client).emit("lock", track)
+      }
+    })
   });
 
-  socket.on("unlock", function(track, userSocket) {
+  socket.on("unlock", function(roomName, userSocket, track) {
     logger.info("unlock: ", track, " by: ", userSocket)
+    var clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets);
+    clients.forEach(function(client) {
+      if (client !== userSocket){
+        socket.to(client).emit("unlock", track)
+      }
+    })
   });
 
-  socket.on("pushTracks", function(track, userSocket, rev, trackBranchData, buffersToSend) {
-    logger.info("PushedTrackData: ", track, userSocket, rev, trackBranchData, buffersToSend)
-    console.log(buffersToSend)
+  socket.on("pushTracks", function(roomName, userSocket, track, rev, trackBranchData, files) {
+    logger.info("PushedTrackData: ", track, userSocket, rev, trackBranchData)
+    console.log(files)
+    var clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets);
+    clients.forEach(function(client) {
+      if (client !== userSocket){
+        socket.to(client).emit("newBranch", track, rev, trackBranchData, files)
+      }
+    })
   });
 
   socket.on("join-room", function(roomId){

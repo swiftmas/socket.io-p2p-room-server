@@ -65,6 +65,15 @@ function createBuffer(fileName) {
   fileReader.readAsArrayBuffer(kekFileData[fileName].value)
 }
 
+function createAudioBufferFromArrayBuffer(fileName){
+  context.decodeAudioData(originArrayBuffer[fileName]).then(function (audioBuffer) {
+    bufferData.buffers[fileName] = audioBuffer;
+    console.log("Buffer Created for: "+ fileName + " at: originArrayBuffer."+fileName)
+    reMathTiming();
+  })
+}
+
+
 /////////////////////////////////////////////////////////////
 
 // Sets up some math I dont wanna do right now and starts main loop. NEEDS REMOVED

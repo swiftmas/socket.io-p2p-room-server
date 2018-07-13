@@ -31,6 +31,7 @@ function pageDraw(){
     let trackName = songData.tracks[track].trackName
     let trackClass = "track-header"
     if (editorData.track == track){trackClass = "track-header-selected"}
+    if (editorData.locked.indexOf(track) >= 0){trackClass = "track-header-locked"}
     let mark1 = `
         <div class="${trackClass}" id="track-header-${track}">
           <div onchange="alert('THIS HAPPENED')" contenteditable="true">${trackName}</div>
@@ -79,7 +80,10 @@ function draw(){
       } else if (editorData.track != "none" && editorData.track != i) {
         my_gradient.addColorStop(0, "#c3c3c3");
         my_gradient.addColorStop(1, "#474647");
-      } else {
+      } else if (editorData.locked.indexOf(i) >= 0) {
+        my_gradient.addColorStop(0, "#c3c3c3");
+        my_gradient.addColorStop(1, "#474647");
+      } else{
         my_gradient.addColorStop(0, "#2ff3f3");
         my_gradient.addColorStop(1, "#b400e1");
       }

@@ -74,6 +74,14 @@ canvas {
   white-space: nowrap;
 }
 
+.track-header-locked{
+  width: 100%;
+  height: 72px;
+  padding: 4px;
+  margin-bottom: 2px;
+  background-color: #5d5d5d;
+  white-space: nowrap;
+}
 
 /*  MESSAGING STUFF */
 .module {
