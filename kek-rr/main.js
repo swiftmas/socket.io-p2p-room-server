@@ -34,12 +34,19 @@ function init() {
     .then(stream => {
       recorder = new MediaRecorder(stream);
       recorder.addEventListener("dataavailable", event => {
-            console.log("its workings")
-            kekFileData["record"]=[]
-            kekFileData["record"].push(event.data)
-            kekFileData["newAudio"] = new Blob(kekFileData["record"])
+            console.log(event)
+            //kekFileData["record"]=event.data
+            //kekFileData["record"].push(event.data)
+            let audioBlob = new Blob([event.data], { type: "video/webm" });
+            kekFileData["record"] = {value: audioBlob}
+            console.log(kekFileData["record"])
             //.then(function(){
-            //  bufferData(newAudio)
+            fileName="record"
+            createBuffer("record")
+            var rev = editorData.revision
+            var track = editorData.track
+          	var newtrack = {"file":fileName, "init_formal": [0,0,0,0,0]}
+          	songData.tracks[track].revisions[rev].audio.push(newtrack)
             //});
       });
     });
